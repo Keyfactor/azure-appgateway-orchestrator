@@ -1,0 +1,18 @@
+{
+  "extensions": {
+    "Keyfactor.Orchestrators.Extensions.IOrchestratorJobExtension": {
+      "CertStores.AzureAppGW.Inventory": {
+        "assemblypath": "Keyfactor.Extensions.Orchestrators.AzureAppGW.dll",
+        "TypeFullName": "Keyfactor.Extensions.Orchestrator.AzureAppGateway.Jobs.Inventory"
+      },
+      "CertStores.AzureAppGW.Management": {
+        "assemblypath": "Keyfactor.Extensions.Orchestrators.AzureAppGW.dll",
+        "TypeFullName": "Keyfactor.Extensions.Orchestrator.AzureAppGateway.Jobs.Management"
+      },
+      "CertStores.AzureAppGW.Discovery": {
+        "assemblypath": "Keyfactor.Extensions.Orchestrators.AzureAppGW.dll",
+        "TypeFullName": "Keyfactor.Extensions.Orchestrator.AzureAppGateway.Jobs.Discovery"
+      }
+    }
+  }
+}

@@ -12,7 +12,6 @@
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
     <DefineConstants></DefineConstants>
-    <OutputPath>C:\Program Files\Keyfactor\Keyfactor Orchestrator\extensions\AzureAppGW</OutputPath>
   </PropertyGroup>
 
   <ItemGroup>

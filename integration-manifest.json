@@ -1,0 +1,33 @@
+
+{
+  "$schema": "https://keyfactor.github.io/integration-manifest-schema.json",
+  "integration_type": "orchestrator",
+  "name": "Azure Application Gateway Orchestrator",
+  "status": "prototype",
+  "update_catalog": true,
+  "link_github": true,
+  "support_level": "kf-supported",
+  "description": "The Azure Application Gateway Orchestrator extension acts as a proxy between Keyfactor and Azure that allows Keyfactor to manage Application Gateway certificates.",
+  "about": {
+    "orchestrator": {
+      "win": {
+        "supportsCreateStore": true,
+        "supportsDiscovery": false,
+        "supportsManagementAdd": true,
+        "supportsManagementRemove": true,
+        "supportsReenrollment": false,
+        "supportsInventory": true,
+        "platformSupport": "Unused"
+      },
+      "linux": {
+        "supportsCreateStore": true,
+        "supportsDiscovery": false,
+        "supportsManagementAdd": true,
+        "supportsManagementRemove": true,
+        "supportsReenrollment": false,
+        "supportsInventory": true,
+        "platformSupport": "Unused"
+      }
+    }
+  }
+}

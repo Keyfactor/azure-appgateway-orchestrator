@@ -46,8 +46,6 @@ The Keyfactor Universal Orchestrator may be installed on either Windows or Linux
 ---
 
 
-# Azure Application Gateway Orchestrator
-
 ## Overview
 The Azure Application Gateway Orchestrator extension remotely manages certificates used by azure 
 Application Gateways. The extension implements the Inventory, Management Add, and Management Remove

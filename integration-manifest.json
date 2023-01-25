@@ -11,7 +11,7 @@
   "about": {
     "orchestrator": {
       "win": {
-        "supportsCreateStore": true,
+        "supportsCreateStore": false,
         "supportsDiscovery": false,
         "supportsManagementAdd": true,
         "supportsManagementRemove": true,
@@ -20,7 +20,7 @@
         "platformSupport": "Unused"
       },
       "linux": {
-        "supportsCreateStore": true,
+        "supportsCreateStore": false,
         "supportsDiscovery": false,
         "supportsManagementAdd": true,
         "supportsManagementRemove": true,

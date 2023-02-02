@@ -35,7 +35,7 @@ The Keyfactor Universal Orchestrator may be installed on either Windows or Linux
 |-----|-----|------|
 |Supports Management Add|&check; |&check; |
 |Supports Management Remove|&check; |&check; |
-|Supports Create Store|&check; |&check; |
+|Supports Create Store|  |  |
 |Supports Discovery|  |  |
 |Supports Renrollment|  |  |
 |Supports Inventory|&check; |&check; |
@@ -45,8 +45,6 @@ The Keyfactor Universal Orchestrator may be installed on either Windows or Linux
 
 ---
 
-
-# Azure Application Gateway Orchestrator
 
 ## Overview
 The Azure Application Gateway Orchestrator extension remotely manages certificates used by azure 
@@ -150,10 +148,7 @@ by Keyfactor Orchestrators. To create the Azure Application Gateway Certificate 
      "BlueprintAllowed": false,
      "CustomAliasAllowed": "Required",
      "ServerRegistration": 13,
-     "InventoryEndpoint": "/AnyInventory/Update",
-     "InventoryJobType": "495f896d-cf44-4f0c-8d47-d11369404142",
-     "ManagementJobType": "0a6623e6-2b27-42ba-917a-3cea8a1a43ce",
-     "DiscoveryJobType": "40306f54-d165-447e-8020-c0c25c238079"
+     "InventoryEndpoint": "/AnyInventory/Update"
    }
    EOF
    kfutil store-types create --from-file AzureAppGW.json

@@ -1,12 +1,16 @@
 ## Overview
 The Azure Application Gateway Orchestrator extension remotely manages certificates used by azure 
-Application Gateways. The extension implements the Inventory, Management Add, and Management Remove
-job types. 
+Application Gateways. The extension implements the Inventory, Management Add, Management Remove,
+and Discovery job types. 
 
 The Add and Remove operations create and remove _ApplicationGatewaySslCertificate_'s associated with
 the Application Gateway. The Add operation implements an optional enrollment field for an HTTP Listener name. If
 provided, the certificate will be associated with the listener. If a certificate is associated with a listener,
 the Remove operation assigns a default certificate to the listener before removal.
+
+The Discovery operation discovers all Azure Application Gateways in each resource group that the service principal has access to.
+The discovered Application Gateways are added to the discovered certificates in the Keyfactor platform and can be easily
+added as certificate stores.
 
 ## Azure Configuration
 The Azure Application Gateway Orchestrator extension uses an Azure Service Principal for authentication. Follow Microsoft's
@@ -66,14 +70,6 @@ by Keyfactor Orchestrators. To create the Azure Application Gateway Certificate 
          "DependsOn": null,
          "DefaultValue": "true",
          "Required": false
-       },
-       {
-         "Name": "TenantID",
-         "DisplayName": "Azure Tenant ID",
-         "Type": "String",
-         "DependsOn": null,
-         "DefaultValue": null,
-         "Required": true
        }
      ],
      "EntryParameters": [
@@ -100,28 +96,23 @@ by Keyfactor Orchestrators. To create the Azure Application Gateway Certificate 
      "BlueprintAllowed": false,
      "CustomAliasAllowed": "Required",
      "ServerRegistration": 13,
-     "InventoryEndpoint": "/AnyInventory/Update",
-     "InventoryJobType": "495f896d-cf44-4f0c-8d47-d11369404142",
-     "ManagementJobType": "0a6623e6-2b27-42ba-917a-3cea8a1a43ce",
-     "DiscoveryJobType": "40306f54-d165-447e-8020-c0c25c238079"
+     "InventoryEndpoint": "/AnyInventory/Update"
    }
    EOF
    kfutil store-types create --from-file AzureAppGW.json
    ```
 
-### Keyfactor Store Configuration
-1. In Keyfactor Command, drop down the _Locations_ tab and select _Certificate Stores_
-2. Select the _Add_ button to create a new certificate store
-3. Under the _Category_ drop down menu, select _Azure Application Gateway_
-4. If applicable, select the container for the new certificate store
-5. Populate the _Client Machine_ with the Azure Subscription ID that manages the Application Gateway
-6. Populate the _Store Path_ with the Azure Resource ID of the Application Gateway. This should be in the following form:
-    ```
-    /subscriptions/<subscription-id>/resourceGroups/<resource-group-name>/providers/Microsoft.Network/applicationGateways/<application-gateway-name>
-    ```
-7. Under the _Orchestrator_ dropdown, select the orchestrator that will be used to manage the certificate store.
-8. Select **SET SERVER USERNAME** and enter the Application ID of the service principal that will be used to manage the Application Gateway.
-9. Select **SET SERVER PASSWORD** and enter the Secret of the service principal that will be used to manage the Application Gateway.
-10. Use the default _True_ option for the _Use SSL_ field.
-11. Populate the _Azure Tenant ID_ field with the Azure Tenant ID associated with the service principal.
-12. Under the _Inventory Schedule_ dropdown, select and configure the desired inventory schedule.
+### Keyfactor Store and Discovery Job Configuration
+To create a new certificate store in Keyfactor Command, select the _Locations_ drop down, select _Certificate Stores_, and click the _Add_ button.
+To schedule a discovery job, select the _Locations_ drop down, select _Certificate Stores_, click on the _Discovery_ button, and click the _Schedule_ button. For both operations,
+fill the form with the following values:
+
+| Parameter       | Value                           | Description                                                                                                                                                                                                 |
+|-----------------|---------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| Category        | 'Azure Application Gateway'     | Name of the Appplication Gateway store type                                                                                                                                                                 |
+| Client Machine  | Azure Tenant ID                 | The Azure Tenant ID of the service principal                                                                                                                                                                |
+| Store Path      | Application Gateway resource ID | Azure resource ID of the application gateway in the form `/subscriptions/<subscription-id>/resourceGroups/<resource-group-name>/providers/Microsoft.Network/applicationGateways/<application-gateway-name>` |
+| Server Username | Application ID                  | Application ID of the service principal that will be used to manage the Application Gateway                                                                                                                 |
+| Server Password | Client Secret                   | Secret of the service principal that will be used to manage the Application Gateway                                                                                                                         |
+
+For the discovery job, populate the _Directories to search_ with any value. The extension will discover all Application Gateways accessible by the Azure Service Principal.

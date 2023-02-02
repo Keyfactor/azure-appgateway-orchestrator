@@ -17,18 +17,25 @@ namespace Keyfactor.Extensions.Orchestrator.AzureAppGateway.Jobs
             
             AzureProperties azureProperties = new AzureProperties
             {
-                TenantId = properties?.TenantID,
+                TenantId = details.ClientMachine,
                 ApplicationId = properties?.ServerUsername,
-                ClientSecret = properties?.ServerPassword,
-                GatewayResourceId = new ResourceIdentifier(details.StorePath)
+                ClientSecret = properties?.ServerPassword
             };
             
-            GatewayClient = new AzureAppGatewayClient(azureProperties);
+            GatewayClient = new AzureAppGatewayClient(azureProperties)
+            {
+                AppGatewayResourceId = new ResourceIdentifier(details.StorePath)
+            };
         }
 
         protected void Initialize(DiscoveryJobConfiguration config)
         {
-            AzureProperties azureProperties = new AzureProperties();
+            AzureProperties azureProperties = new AzureProperties
+            {
+                TenantId = config.ClientMachine,
+                ApplicationId = config.ServerUsername,
+                ClientSecret = config.ServerPassword
+            };
             
             GatewayClient = new AzureAppGatewayClient(azureProperties);
         }

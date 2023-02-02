@@ -12,7 +12,7 @@
     "orchestrator": {
       "win": {
         "supportsCreateStore": true,
-        "supportsDiscovery": false,
+        "supportsDiscovery": true,
         "supportsManagementAdd": true,
         "supportsManagementRemove": true,
         "supportsReenrollment": false,
@@ -21,7 +21,7 @@
       },
       "linux": {
         "supportsCreateStore": true,
-        "supportsDiscovery": false,
+        "supportsDiscovery": true,
         "supportsManagementAdd": true,
         "supportsManagementRemove": true,
         "supportsReenrollment": false,

@@ -36,6 +36,8 @@ namespace Keyfactor.Extensions.Orchestrator.AzureAppGateway.Jobs
                 result.FailureMessage = "Error getting App Gateway SSL Certificates:\n" + ex.Message;
                 return result;
             }
+            
+            _logger.LogDebug($"Found {inventoryItems.Count} certificates in App Gateway");
 
             cb.DynamicInvoke(inventoryItems);
             

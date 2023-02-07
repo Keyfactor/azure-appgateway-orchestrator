@@ -92,6 +92,7 @@ namespace Keyfactor.Extensions.Orchestrator.AzureAppGateway.Client
                     UseChainLevel = true,
                     Certificates = list
                 };
+                Log.LogDebug("    Found certificate called \"{CertificateName}\" ({ResourceId})", certObject.Name, certObject.Id);
                 inventoryItems.Add(inventoryItem);
             }
             Log.LogDebug("Found {CertificateCount} certificates in app gateway", inventoryItems.Count);
@@ -150,7 +151,7 @@ namespace Keyfactor.Extensions.Orchestrator.AzureAppGateway.Client
                     throw new Exception(error);
                 }
                 // Reassign the listener to use the new certificate
-                Log.LogDebug("Certificate called \"{CertificateName}\" is in use by listener \"{ListenerName}\".", certificateName, listener.Name);
+                Log.LogDebug("Certificate called \"{CertificateName}\" is in use by listener \"{ListenerName}\". Reassigning listener to use certificate called \"{NewCert}\"", certificateName, listener.Name, newCertificate.Name);
                 UpdateAppGatewayListenerCertificate(newCertificate, listener.Name);
                 
                 // If update succeeded, appGatewayResource is out of date. Get it again.
@@ -207,6 +208,8 @@ namespace Keyfactor.Extensions.Orchestrator.AzureAppGateway.Client
             {
                 appGatewayIds.AddRange(rg.GetApplicationGateways().GetAll().Select(appGateway => appGateway.Data.Id.ToString()));
             }
+            
+            Log.LogDebug("Discovered {AppGatewayCount} App Gateways", appGatewayIds.Count);
 
             return appGatewayIds;
         }

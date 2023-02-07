@@ -26,11 +26,13 @@ namespace AzureAppGatewayTest
             {
                 TenantId = Environment.GetEnvironmentVariable("AZURE_TENANT_ID") ?? string.Empty,
                 ApplicationId = Environment.GetEnvironmentVariable("AZURE_CLIENT_ID") ?? string.Empty,
-                ClientSecret = Environment.GetEnvironmentVariable("AZURE_CLIENT_SECRET") ?? string.Empty,
-                GatewayResourceId = new ResourceIdentifier(Environment.GetEnvironmentVariable("AZURE_GATEWAY_RESOURCE_ID") ?? string.Empty)
+                ClientSecret = Environment.GetEnvironmentVariable("AZURE_CLIENT_SECRET") ?? string.Empty
             };
 
-            Client = new AzureAppGatewayClient(properties);
+            Client = new AzureAppGatewayClient(properties)
+            {
+                AppGatewayResourceId = new ResourceIdentifier(Environment.GetEnvironmentVariable("AZURE_GATEWAY_RESOURCE_ID") ?? string.Empty)
+            };
         }
 
         private AzureAppGatewayClient Client { get; }

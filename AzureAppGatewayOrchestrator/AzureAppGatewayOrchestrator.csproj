@@ -4,7 +4,6 @@
     <TargetFramework>netcoreapp3.1</TargetFramework>
     <RootNamespace>Keyfactor.Extensions.Orchestrator.AzureAppGateway</RootNamespace>
     <AssemblyName>Keyfactor.Extensions.Orchestrators.AzureAppGW</AssemblyName>
-    <BaseOutputPath>C:\Program Files\Keyfactor\Keyfactor Orchestrator\extensions\AzureAppGW</BaseOutputPath>
     <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
     <AppendRuntimeIdentifierToOutputPath>false</AppendRuntimeIdentifierToOutputPath>
     <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>

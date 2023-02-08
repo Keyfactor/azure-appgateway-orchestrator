@@ -1,4 +1,18 @@
-﻿using System;
+﻿// Copyright 2023 Keyfactor
+// 
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+// 
+//     http://www.apache.org/licenses/LICENSE-2.0
+// 
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+using System;
 using Azure.ResourceManager.Network.Models;
 using Keyfactor.Logging;
 using Keyfactor.Orchestrators.Common.Enums;
@@ -28,31 +42,25 @@ namespace Keyfactor.Extensions.Orchestrator.AzureAppGateway.Jobs
                 switch (config.OperationType)
                 {
                     case CertStoreOperationType.Add:
-                        _logger.LogDebug("Got Add operation");
-                        ApplicationGatewaySslCertificate cert = PerformAddition(config.JobCertificate);
-
-                        if (!string.IsNullOrWhiteSpace(config.JobProperties["HTTPListenerName"]?.ToString()))
-                        {
-                            try
-                            {
-                                GatewayClient.UpdateAppGatewayListenerCertificate(cert, config.JobProperties["HTTPListenerName"].ToString());
-                            } catch (Exception)
-                            {
-                                // If we fail to update the listener, we want to remove the certificate from the gateway.
-                                // Otherwise, we'll have a certificate in the gateway that isn't being used and existing
-                                // in a limbo state in Keyfactor.
-                                GatewayClient.RemoveAppGatewaySslCertificate(config.JobCertificate.Alias);
-                                throw;
-                            }
-                        }
+                        _logger.LogDebug("Adding certificate to App Gateway");
+                        
+                        PerformAddition(config);
+                        
+                        _logger.LogDebug("Add operation complete.");
                         
                         result.Result = OrchestratorJobStatusJobResult.Success;
                         break;
                     case CertStoreOperationType.Remove:
-                        _logger.LogDebug("Got Remove operation");
+                        _logger.LogDebug("Removing certificate from App Gateway");
+                        
                         GatewayClient.RemoveAppGatewaySslCertificate(config.JobCertificate.Alias);
+                        
+                        _logger.LogDebug("Remove operation complete.");
                         result.Result = OrchestratorJobStatusJobResult.Success;
                         break;
+                    default:
+                        _logger.LogDebug("Invalid management operation type: {0}", config.OperationType);
+                        throw new ArgumentOutOfRangeException();
                 }
             } catch (Exception ex)
             {
@@ -63,19 +71,40 @@ namespace Keyfactor.Extensions.Orchestrator.AzureAppGateway.Jobs
             return result;
         }
 
-        private ApplicationGatewaySslCertificate PerformAddition(ManagementJobCertificate certificate)
+        private void PerformAddition(ManagementJobConfiguration config)
         {
-            if (string.IsNullOrWhiteSpace(certificate.PrivateKeyPassword))
+            // Ensure that the certificate is in PKCS#12 format.
+            if (string.IsNullOrWhiteSpace(config.JobCertificate.PrivateKeyPassword))
             {
                 throw new Exception("Certificate must be in PKCS#12 format.");
             }
-
-            if (string.IsNullOrWhiteSpace(certificate.Alias))
+            // Ensure that an alias is provided.
+            if (string.IsNullOrWhiteSpace(config.JobCertificate.Alias))
             {
                 throw new Exception("Certificate alias is required.");
             }
             
-            return GatewayClient.AddAppGatewaySslCertificate(certificate.Alias, certificate.Contents, certificate.PrivateKeyPassword);
+            ApplicationGatewaySslCertificate cert =  GatewayClient.AddAppGatewaySslCertificate(config.JobCertificate.Alias, config.JobCertificate.Contents, config.JobCertificate.PrivateKeyPassword);
+            
+            _logger.LogDebug("Added certificate to App Gateway called \"{0}\" ({1})", cert.Id, cert.Name);
+
+            if (string.IsNullOrWhiteSpace(config.JobProperties["HTTPListenerName"]?.ToString())) return;
+            
+            _logger.LogDebug("Enrollment field 'HTTPListenerName' is set to \"{0}\". Updating listener with new certificate.", config.JobProperties["HTTPListenerName"].ToString());
+            try
+            {
+                GatewayClient.UpdateAppGatewayListenerCertificate(cert, config.JobProperties["HTTPListenerName"].ToString());
+            } catch (Exception)
+            {
+                // If we fail to update the listener, we want to remove the certificate from the gateway.
+                // Otherwise, we'll have a certificate in the gateway that isn't being used and existing
+                // in a limbo state in Keyfactor.
+                _logger.LogWarning("Failed to update listener with new certificate. Removing certificate from App Gateway.");
+                GatewayClient.RemoveAppGatewaySslCertificate(config.JobCertificate.Alias);
+                throw;
+            }
+                
+            _logger.LogDebug("Updated listener with new certificate.");
         }
     }
 }

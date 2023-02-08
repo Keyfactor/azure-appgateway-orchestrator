@@ -11,7 +11,7 @@ namespace Keyfactor.Extensions.Orchestrator.AzureAppGateway.Jobs
     {
         ILogger _logger = LogHandler.GetClassLogger<Discovery>();
 
-        public JobResult ProcessJob(DiscoveryJobConfiguration config, SubmitDiscoveryUpdate sdu)
+        public JobResult ProcessJob(DiscoveryJobConfiguration config, SubmitDiscoveryUpdate callback)
         {
             _logger.LogDebug("Beginning App Gateway Discovery Job");
             
@@ -25,7 +25,8 @@ namespace Keyfactor.Extensions.Orchestrator.AzureAppGateway.Jobs
 
             try
             {
-                sdu(GatewayClient.DiscoverAppGateways());
+                callback(GatewayClient.DiscoverAppGateways());
+                result.Result = OrchestratorJobStatusJobResult.Success;
             } catch (Exception ex)
             {
                 _logger.LogError(ex, "Error processing job:\n {0}", ex.Message);

@@ -204,6 +204,7 @@ namespace Keyfactor.Extensions.Orchestrator.AzureAppGateway.Client
                 
                 // If update succeeded, appGatewayResource is out of date. Get it again.
                 appGatewayResource = ArmClient.GetApplicationGatewayResource(_appGatewayResourceId).Get();
+                gatewaySslCertificate = appGatewayResource.Data.SslCertificates.FirstOrDefault(c => c.Name == certificateName);
             }
 
             // Remove the certificate object from the App Gateway resource

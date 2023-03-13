@@ -3,7 +3,7 @@
   "$schema": "https://keyfactor.github.io/integration-manifest-schema.json",
   "integration_type": "orchestrator",
   "name": "Azure Application Gateway Orchestrator",
-  "status": "prototype",
+  "status": "production",
   "update_catalog": false,
   "link_github": false,
   "support_level": "kf-supported",

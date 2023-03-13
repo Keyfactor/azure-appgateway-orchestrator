@@ -2,7 +2,7 @@
 
 The Azure Application Gateway Orchestrator extension acts as a proxy between Keyfactor and Azure that allows Keyfactor to manage Application Gateway certificates.
 
-#### Integration status: Prototype - Demonstration quality. Not for use in customer environments.
+#### Integration status: Production - Ready for use in production environments.
 
 ## About the Keyfactor Universal Orchestrator Capability
 

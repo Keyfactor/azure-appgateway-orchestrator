@@ -84,27 +84,30 @@ namespace Keyfactor.Extensions.Orchestrator.AzureAppGateway.Jobs
                 throw new Exception("Certificate alias is required.");
             }
             
-            ApplicationGatewaySslCertificate cert =  GatewayClient.AddAppGatewaySslCertificate(config.JobCertificate.Alias, config.JobCertificate.Contents, config.JobCertificate.PrivateKeyPassword);
-            
-            _logger.LogDebug("Added certificate to App Gateway called \"{0}\" ({1})", cert.Id, cert.Name);
-
-            if (string.IsNullOrWhiteSpace(config.JobProperties["HTTPListenerName"]?.ToString())) return;
-            
-            _logger.LogDebug("Enrollment field 'HTTPListenerName' is set to \"{0}\". Updating listener with new certificate.", config.JobProperties["HTTPListenerName"].ToString());
-            try
+            if (GatewayClient.AppGatewaySslCertificateExists(config.JobCertificate.Alias) && !config.Overwrite)
             {
-                GatewayClient.UpdateAppGatewayListenerCertificate(cert, config.JobProperties["HTTPListenerName"].ToString());
-            } catch (Exception)
-            {
-                // If we fail to update the listener, we want to remove the certificate from the gateway.
-                // Otherwise, we'll have a certificate in the gateway that isn't being used and existing
-                // in a limbo state in Keyfactor.
-                _logger.LogWarning("Failed to update listener with new certificate. Removing certificate from App Gateway.");
-                GatewayClient.RemoveAppGatewaySslCertificate(config.JobCertificate.Alias);
-                throw;
+                string message =
+                    $"Certificate with alias \"{config.JobCertificate.Alias}\" already exists in App Gateway, and job was not configured to overwrite.";
+                _logger.LogDebug(message);
+                throw new Exception(message);
             }
-                
-            _logger.LogDebug("Updated listener with new certificate.");
+            
+            string listenerName = config.JobProperties["HTTPListenerName"]?.ToString();
+            if (!string.IsNullOrWhiteSpace(config.JobProperties["HTTPListenerName"]?.ToString()))
+            {
+                _logger.LogDebug("Enrollment field 'HTTPListenerName' is set to \"{0}\". Also updating HTTP Listener.", config.JobProperties["HTTPListenerName"].ToString());
+            }
+            
+            if (config.Overwrite)
+            {
+                _logger.LogDebug("Overwrite is enabled, replacing certificate in gateway called \"{0}\"", config.JobCertificate.Alias);
+                GatewayClient.ReplaceAppGatewayCertificate(config.JobCertificate.Alias, config.JobCertificate.Contents, config.JobCertificate.PrivateKeyPassword);
+            }
+            else
+            {
+                _logger.LogDebug("Adding certificate to App Gateway");
+                GatewayClient.AddAppGatewaySslCertificate(config.JobCertificate.Alias, config.JobCertificate.Contents, config.JobCertificate.PrivateKeyPassword, listenerName);
+            }
         }
     }
 }

@@ -2,7 +2,7 @@
 
 The Azure Application Gateway Orchestrator extension acts as a proxy between Keyfactor and Azure that allows Keyfactor to manage Application Gateway certificates.
 
-#### Integration status: Prototype - Demonstration quality. Not for use in customer environments.
+#### Integration status: Production - Ready for use in production environments.
 
 ## About the Keyfactor Universal Orchestrator Capability
 
@@ -164,4 +164,13 @@ fill the form with the following values:
 | Server Password | Client Secret                   | Secret of the service principal that will be used to manage the Application Gateway                                                                                                                         |
 
 For the discovery job, populate the _Directories to search_ with any value. The extension will discover all Application Gateways accessible by the Azure Service Principal.
+
+### Important note about Certificate Renewal
+The Azure Application Gateway Orchestrator extension supports certificate renewal. If a certificate is renewed and is associated with an HTTP Listener,
+the extension will automatically re-associate the renewed certificate with the listener. The renewal workflow is as follows:
+1. Create temporary `ApplicationGatewaySslCertificate` with the new certificate and private key
+2. If the renewal certificate is associated with an HTTP Listener, assign the temporary certificate to the listener
+3. Remove the original `ApplicationGatewaySslCertificate`
+4. Create a new `ApplicationGatewaySslCertificate` with the original certificate's name and the new certificate and private key, and if applicable, assign it to the HTTP listener
+5. Remove the temporary `ApplicationGatewaySslCertificate`
 

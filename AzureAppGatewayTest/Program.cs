@@ -28,10 +28,21 @@ namespace AzureAppGatewayTest
         public static void Main(string[] args)
         {
             Program p = new Program();
+            string httpListenerName = "routing-listener1";
+            
+            string password = "password";
+            string certName = "GatewayTest" + Guid.NewGuid().ToString()[..6];
+            X509Certificate2 ssCert = GetSelfSignedCert(certName);
+            string b64PfxSslCert = Convert.ToBase64String(ssCert.Export(X509ContentType.Pfx, password));
             
             p.TestGetCertificates();
-            string name = p.TestAddCertificate();
-            p.RemoveCertificate(name);
+            p.TestAddCertificate(certName, b64PfxSslCert, password, httpListenerName);
+
+
+            ssCert = GetSelfSignedCert(certName);
+            b64PfxSslCert = Convert.ToBase64String(ssCert.Export(X509ContentType.Pfx, password));
+            p.ReplaceCertificate(certName, b64PfxSslCert, password, httpListenerName);
+            p.RemoveCertificate(certName);
         }
 
         public Program()
@@ -60,20 +71,21 @@ namespace AzureAppGatewayTest
             }
         }
 
-        public string TestAddCertificate()
+        public void TestAddCertificate(string certName, string b64PfxSslCert, string password, string httpListenerName = "")
         {
             // Generate random name for hostname and certificate name
-            string certName = "GatewayTest" + Guid.NewGuid().ToString().Substring(0, 6);
-            X509Certificate2 ssCert = GetSelfSignedCert(certName);
-            string b64PfxSsCert = Convert.ToBase64String(ssCert.Export(X509ContentType.Pfx, "password"));
-            Console.Write("Adding App Gateway Certificate...\n");
-            ApplicationGatewaySslCertificate certObject = Client.AddAppGatewaySslCertificate(certName, b64PfxSsCert, "password");
             
-            //Client.UpdateAppGatewayListenerCertificate(certObject, "routing-listener1");
-            return certName;
+            Console.Write("Adding App Gateway Certificate...\n");
+            Client.AddAppGatewaySslCertificate(certName, b64PfxSslCert, password, httpListenerName);
         }
         
-        public X509Certificate2 GetSelfSignedCert(string hostname)
+        public void ReplaceCertificate(string certName, string b64PfxSslCert, string password, string httpListenerName = "")
+        {
+            Console.Write($"Replacing App Gateway Certificate called \"{certName}\"...\n");
+            Client.ReplaceAppGatewayCertificate(certName, b64PfxSslCert, password);
+        }
+
+        private static X509Certificate2 GetSelfSignedCert(string hostname)
         {
             RSA rsa = RSA.Create(2048);
             CertificateRequest req = new CertificateRequest($"CN={hostname}", rsa, HashAlgorithmName.SHA256,
@@ -86,13 +98,13 @@ namespace AzureAppGatewayTest
             req.CertificateExtensions.Add(new X509EnhancedKeyUsageExtension(new OidCollection { new Oid("2.5.29.32.0"), new Oid("1.3.6.1.5.5.7.3.1") }, false));
             
             X509Certificate2 selfSignedCert = req.CreateSelfSigned(DateTimeOffset.Now, DateTimeOffset.Now.AddYears(5));
-            Console.Write($"Created self-signed certificate for {hostname} with thumbprint {selfSignedCert.Thumbprint}\n");
+            Console.Write($"Created self-signed certificate for \"{hostname}\" with thumbprint {selfSignedCert.Thumbprint}\n");
             return selfSignedCert;
         }
-        
+
         public void RemoveCertificate(string certName)
         {
-            Console.Write("Removing App Gateway Certificate...\n");
+            Console.Write($"Removing App Gateway Certificate called \"{certName}\"...\n");
             Client.RemoveAppGatewaySslCertificate(certName);
         }
     }

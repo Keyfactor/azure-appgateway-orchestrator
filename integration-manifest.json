@@ -26,6 +26,71 @@
         "supportsReenrollment": false,
         "supportsInventory": true,
         "platformSupport": "Unused"
+      },
+      "store_types": {
+        "Name": "Azure Application Gateway",
+        "ShortName": "AzureAppGW",
+        "Capability": "AzureAppGW",
+        "LocalStore": false,
+        "SupportedOperations": {
+          "Add": true,
+          "Create": false,
+          "Discovery": true,
+          "Enrollment": false,
+          "Remove": true
+        },
+        "Properties": [
+          {
+            "Name": "ServerUsername",
+            "DisplayName": "Server Username",
+            "Type": "Secret",
+            "DependsOn": null,
+            "DefaultValue": null,
+            "Required": true
+          },
+          {
+            "Name": "ServerPassword",
+            "DisplayName": "Server Password",
+            "Type": "Secret",
+            "DependsOn": null,
+            "DefaultValue": null,
+            "Required": true
+          },
+          {
+            "Name": "ServerUseSsl",
+            "DisplayName": "Use SSL",
+            "Type": "Bool",
+            "DependsOn": null,
+            "DefaultValue": "true",
+            "Required": false
+          }
+        ],
+        "EntryParameters": [
+          {
+            "Name": "HTTPListenerName",
+            "DisplayName": "HTTP Listener Name",
+            "Type": "String",
+            "RequiredWhen": {
+              "HasPrivateKey": false,
+              "OnAdd": false,
+              "OnRemove": false,
+              "OnReenrollment": false
+            }
+          }
+        ],
+        "PasswordOptions": {
+          "EntrySupported": false,
+          "StoreRequired": false,
+          "Style": "Default"
+        },
+        "PrivateKeyAllowed": "Required",
+        "ServerRequired": true,
+        "PowerShell": false,
+        "BlueprintAllowed": false,
+        "CustomAliasAllowed": "Required",
+        "ServerRegistration": 13,
+        "InventoryEndpoint": "/AnyInventory/Update"
+
       }
     }
   }

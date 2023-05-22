@@ -90,7 +90,6 @@
         "CustomAliasAllowed": "Required",
         "ServerRegistration": 13,
         "InventoryEndpoint": "/AnyInventory/Update"
-
       }
     }
   }

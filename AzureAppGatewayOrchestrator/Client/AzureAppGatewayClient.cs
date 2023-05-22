@@ -29,6 +29,7 @@ using Keyfactor.Logging;
 using Keyfactor.Orchestrators.Common.Enums;
 using Keyfactor.Orchestrators.Extensions;
 using Microsoft.Extensions.Logging;
+using Microsoft.VisualBasic;
 
 namespace Keyfactor.Extensions.Orchestrator.AzureAppGateway.Client
 {
@@ -113,7 +114,7 @@ namespace Keyfactor.Extensions.Orchestrator.AzureAppGateway.Client
             return inventoryItems;
         }
         
-        public ApplicationGatewaySslCertificate AddAppGatewaySslCertificate(string certificateName, string certificateData, string certificatePassword)
+        public ApplicationGatewaySslCertificate AddAppGatewaySslCertificate(string certificateName, string certificateData, string certificatePassword, string httpListenerName="")
         {
             ApplicationGatewayResource appGatewayResource =
                 ArmClient.GetApplicationGatewayResource(_appGatewayResourceId).Get();
@@ -134,11 +135,31 @@ namespace Keyfactor.Extensions.Orchestrator.AzureAppGateway.Client
             // Update the App Gateway resource
             appGatewayResource = GetAppGatewayCollection().CreateOrUpdate(WaitUntil.Completed, appGatewayResource.Data.Name, appGatewayResource.Data).WaitForCompletion();
             Log.LogDebug("Added SSL certificate called \"{CertificateName}\" to App Gateway called \"{AppGatewayName}\"", certificateName, appGatewayResource.Data.Name);
+
+            ApplicationGatewaySslCertificate certificateObject = appGatewayResource.Data.SslCertificates.FirstOrDefault(cert => cert.Name == certificateName);
+
+            // If we don't have a listener name, we don't need to update the listener.
+            if (string.IsNullOrEmpty(httpListenerName)) return certificateObject;
             
-            return appGatewayResource.Data.SslCertificates.FirstOrDefault(cert => cert.Name == certificateName);
+            try
+            {
+                // Otherwise, we need to update the listener with the new certificate.
+                UpdateAppGatewayListenerCertificate(certificateObject, httpListenerName);
+            }
+            catch (Exception)
+            {
+                // If we fail to update the listener, we want to remove the certificate from the gateway.
+                // Otherwise, we'll have a certificate in the gateway that isn't being used and existing
+                // in a limbo state.
+                Log.LogWarning("Failed to update listener with new certificate. Removing certificate from App Gateway.");
+                RemoveAppGatewaySslCertificate(certificateName);
+                throw;
+            }
+
+            return certificateObject;
         }
 
-        public void RemoveAppGatewaySslCertificate(string certificateName)
+        public void RemoveAppGatewaySslCertificate(string certificateName, string replacementHttpListenerCertificateName="")
         {
             ApplicationGatewayResource appGatewayResource =
                 ArmClient.GetApplicationGatewayResource(_appGatewayResourceId).Get();
@@ -156,8 +177,21 @@ namespace Keyfactor.Extensions.Orchestrator.AzureAppGateway.Client
             ApplicationGatewayHttpListener listener = appGatewayResource.Data.HttpListeners.FirstOrDefault(l => l.SslCertificateId == gatewaySslCertificate.Id);
             if (listener != null)
             {
-                // If a listener is using the certificate, reassign it the first certificate found that isn't the one we're removing
-                ApplicationGatewaySslCertificate newCertificate = appGatewayResource.Data.SslCertificates.FirstOrDefault(c => c.Name != certificateName);
+                // If a listener is using the certificate, reassign it to another certificate
+                // If no replacement certificate name is specified, use the first available certificate
+                ApplicationGatewaySslCertificate newCertificate;
+                if (string.IsNullOrEmpty(replacementHttpListenerCertificateName))
+                {
+                    newCertificate = appGatewayResource.Data.SslCertificates.FirstOrDefault(c => 
+                        c.Name != certificateName);
+                }
+                else
+                {
+                    
+                    newCertificate = appGatewayResource.Data.SslCertificates.FirstOrDefault(c =>
+                        c.Name == replacementHttpListenerCertificateName);
+                }
+
                 if (newCertificate == null)
                 {
                     string error = $"Certificate called \"{certificateName}\" is in use by listener \"{listener.Name}\" and no other certificates are available for reassignment.";
@@ -170,6 +204,7 @@ namespace Keyfactor.Extensions.Orchestrator.AzureAppGateway.Client
                 
                 // If update succeeded, appGatewayResource is out of date. Get it again.
                 appGatewayResource = ArmClient.GetApplicationGatewayResource(_appGatewayResourceId).Get();
+                gatewaySslCertificate = appGatewayResource.Data.SslCertificates.FirstOrDefault(c => c.Name == certificateName);
             }
 
             // Remove the certificate object from the App Gateway resource
@@ -180,13 +215,45 @@ namespace Keyfactor.Extensions.Orchestrator.AzureAppGateway.Client
             
             Log.LogDebug("Successfully removed SSL certificate called \"{CertificateName}\" from App Gateway called \"{AppGatewayName}\"", certificateName, appGatewayResource.Data.Name);
         }
+        
+        public void ReplaceAppGatewayCertificate(string certificateName, string certificateData, string certificatePassword)
+        {
+            Log.LogDebug("Replacing SSL certificate called \"{CertificateName}\" in App Gateway called \"{AppGatewayName}\"", certificateName, _appGatewayResourceId.Name);
+            // If the certificate exists, we want to remove it and add it again
+            string tempAlias = "";
+            string httpListenerName = AppGatewaySslCertificateIsAttachedToListener(certificateName);
+            if (AppGatewaySslCertificateExists(certificateName))
+            {
+                Log.LogDebug("Certificate called \"{CertificateName}\" already exists\". Replacing it.", certificateName);
+                // First, add the certificate to the App Gateway under a random alias
+                tempAlias = Guid.NewGuid().ToString();
+                
+                // Specify the listener name so that the certificate is assigned to the listener
+                Log.LogDebug("Adding temporary certificate called \"{TempAlias}\"", tempAlias);
+                
+                AddAppGatewaySslCertificate(tempAlias, certificateData, certificatePassword, httpListenerName);
+                
+                // Remove the certificate with the original alias
+                Log.LogDebug("Removing original certificate called \"{CertificateName}\"", certificateName);
+                RemoveAppGatewaySslCertificate(certificateName);
+            }
+            
+            // Add the certificate with the original alias
+            AddAppGatewaySslCertificate(certificateName, certificateData, certificatePassword, httpListenerName);
+
+            if (string.IsNullOrEmpty(tempAlias)) return;
+            
+            // At this point, the temporary certificate shouldn't be assigned to any listeners
+            Log.LogDebug("Removing temporary certificate called \"{TempAlias}\"", tempAlias);
+            RemoveAppGatewaySslCertificate(tempAlias);
+        }
 
         public void UpdateAppGatewayListenerCertificate(ApplicationGatewaySslCertificate certificate, string listenerName)
         {
             ApplicationGatewayResource appGatewayResource = ArmClient.GetApplicationGatewayResource(_appGatewayResourceId).Get();
             
             // First, verify that certificate exists in App Gateway
-            if (appGatewayResource.Data.SslCertificates.FirstOrDefault(c => c.Name == certificate.Name) == null)
+            if (!AppGatewaySslCertificateExists(certificate.Name))
             {
                 string error =
                     $"Certificate with name \"{certificate.Name}\" does not exist in App Gateway \"{appGatewayResource.Data.Name}\"";
@@ -212,6 +279,23 @@ namespace Keyfactor.Extensions.Orchestrator.AzureAppGateway.Client
             appGatewayResource.Data.HttpListeners.Add(listener);
             
             GetAppGatewayCollection().CreateOrUpdate(WaitUntil.Completed, appGatewayResource.Data.Name, appGatewayResource.Data);
+            
+            Log.LogDebug("Successfully updated listener \"{ListenerName}\" with certificate called \"{CertificateName}\".", listenerName, certificate.Name);
+        }
+
+        public bool AppGatewaySslCertificateExists(string certificateName)
+        {
+            ApplicationGatewayResource appGatewayResource = ArmClient.GetApplicationGatewayResource(_appGatewayResourceId).Get();
+            return appGatewayResource.Data.SslCertificates.FirstOrDefault(c => c.Name == certificateName) != null;
+        }
+        
+        public string AppGatewaySslCertificateIsAttachedToListener(string certificateName)
+        {
+            ApplicationGatewayResource appGatewayResource = ArmClient.GetApplicationGatewayResource(_appGatewayResourceId).Get();
+            ApplicationGatewaySslCertificate certificate = appGatewayResource.Data.SslCertificates.FirstOrDefault(c => c.Name == certificateName);
+            if (certificate == null) return "";
+            ApplicationGatewayHttpListener listener = appGatewayResource.Data.HttpListeners.FirstOrDefault(l => l.SslCertificateId == certificate.Id);
+            return listener?.Name;
         }
         
         public IEnumerable<string> DiscoverAppGateways()

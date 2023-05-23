@@ -28,16 +28,18 @@
         "platformSupport": "Unused"
       },
       "store_types": {
-        "Name": "Azure Application Gateway",
-        "ShortName": "AzureAppGW",
-        "Capability": "AzureAppGW",
-        "LocalStore": false,
-        "SupportedOperations": {
-          "Add": true,
-          "Create": false,
-          "Discovery": true,
-          "Enrollment": false,
-          "Remove": true
+        "AzureAppGW" : {
+          "Name": "Azure Application Gateway",
+          "ShortName": "AzureAppGW",
+          "Capability": "AzureAppGW",
+          "LocalStore": false,
+          "SupportedOperations": {
+            "Add": true,
+            "Create": false,
+            "Discovery": true,
+            "Enrollment": false,
+            "Remove": true
+          }
         },
         "Properties": [
           {

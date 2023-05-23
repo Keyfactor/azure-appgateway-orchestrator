@@ -28,6 +28,7 @@
         "platformSupport": "Unused"
       },
       "store_types": {
+        "AzureAppGW" : {
         "Name": "Azure Application Gateway",
         "ShortName": "AzureAppGW",
         "Capability": "AzureAppGW",
@@ -38,7 +39,7 @@
           "Discovery": true,
           "Enrollment": false,
           "Remove": true
-        },
+        }},
         "Properties": [
           {
             "Name": "ServerUsername",

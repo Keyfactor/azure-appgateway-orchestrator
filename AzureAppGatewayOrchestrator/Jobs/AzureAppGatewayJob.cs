@@ -34,14 +34,19 @@ namespace Keyfactor.Extensions.Orchestrator.AzureAppGateway.Jobs
             logger.LogDebug($"Certificate Store Configuration: {JsonConvert.SerializeObject(details)}");
             logger.LogDebug("Initializing AzureAppGatewayClient");
             dynamic properties = JsonConvert.DeserializeObject(details.Properties);
-            
+
             AzureProperties azureProperties = new AzureProperties
             {
                 TenantId = details.ClientMachine,
                 ApplicationId = properties?.ServerUsername,
-                ClientSecret = properties?.ServerPassword
+                ClientSecret = properties?.ServerPassword,
+                AzureCloud = properties?.AzureCloud,
+                PrivateEndpoint = properties?.PrivateEndpoint
             };
-            
+
+            azureProperties.PrivateEndpoint = azureProperties.PrivateEndpoint?.ToLower();
+            azureProperties.AzureCloud = azureProperties.AzureCloud?.ToLower();
+
             GatewayClient = new AzureAppGatewayClient(azureProperties)
             {
                 AppGatewayResourceId = new ResourceIdentifier(details.StorePath)

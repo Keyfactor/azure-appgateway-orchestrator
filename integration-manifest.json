@@ -65,6 +65,22 @@
             "DependsOn": null,
             "DefaultValue": "true",
             "Required": false
+          },
+          {
+            "Name": "AzureCloud",
+            "DisplayName": "Azure Cloud",
+            "Type": "MultipleChoice",
+            "DependsOn": "",
+            "DefaultValue": "public,china,germany,government",
+            "Required": false
+          },
+          {
+            "Name": "PrivateEndpoint",
+            "DisplayName": "Private KeyVault Endpoint",
+            "Type": "String",
+            "DependsOn": "",
+            "DefaultValue": null,
+            "Required": false
           }
         ],
         "EntryParameters": [

@@ -51,7 +51,7 @@ namespace Keyfactor.Extensions.Orchestrator.AzureAppGateway.Client
         private ApplicationGatewayCollection GetAppGatewayParentCollection()
         {
             // Use subscription resource to get resource group resource that contains App Gateway
-            var subscriptionResourceIdentifier = new ResourceIdentifier(_appGatewayResourceId.SubscriptionId);
+            var subscriptionResourceIdentifier = new ResourceIdentifier(_appGatewayResourceId.Parent.Parent);
             var subscriptionResource = _armClient.GetSubscriptionResource(subscriptionResourceIdentifier);
             ResourceGroupResource resourceGroupResource = subscriptionResource.GetResourceGroup(_appGatewayResourceId.ResourceGroupName);
             return resourceGroupResource.GetApplicationGateways();
@@ -138,7 +138,6 @@ namespace Keyfactor.Extensions.Orchestrator.AzureAppGateway.Client
             // Create new certificate object with certificate data
             ApplicationGatewaySslCertificate gatewaySslCertificate = new ApplicationGatewaySslCertificate
             {
-                Id = null,
                 Name = certificateName,
                 Data = BinaryData.FromObjectAsJson(certificateData),
                 Password = certificatePassword
@@ -146,9 +145,11 @@ namespace Keyfactor.Extensions.Orchestrator.AzureAppGateway.Client
 
             // Add the new gateway certificate to the already retrieved App Gateway resource
             appGatewayResource.Data.SslCertificates.Add(gatewaySslCertificate);
+            var parentCollection = GetAppGatewayParentCollection();
 
             // Update the App Gateway resource
-            appGatewayResource = GetAppGatewayParentCollection().CreateOrUpdate(WaitUntil.Completed, appGatewayResource.Data.Name, appGatewayResource.Data).WaitForCompletion();
+            appGatewayResource = parentCollection.CreateOrUpdate(WaitUntil.Completed, appGatewayResource.Data.Name, appGatewayResource.Data).Value;
+
             _logger.LogDebug($"Added SSL certificate called \"{certificateName}\" to App Gateway called \"{appGatewayResource.Data.Name}\"");
 
             ApplicationGatewaySslCertificate certificateObject = appGatewayResource.Data.SslCertificates.FirstOrDefault(cert => cert.Name == certificateName);

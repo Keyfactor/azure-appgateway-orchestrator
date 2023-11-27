@@ -34,72 +34,65 @@ namespace Keyfactor.Extensions.Orchestrator.AzureAppGateway.Client
 {
     public class AzureAppGatewayClient
     {
-        private string _azureCloud { get; set; }
-        private Uri AzureCloudEndpoint
-        {
-            get
-            {
-                switch (_azureCloud)
-                {
+        private ILogger _logger { get; }
 
-                    case "china":
-                        return AzureAuthorityHosts.AzureChina;
-                    case "germany":
-                        return AzureAuthorityHosts.AzureGermany;
-                    case "government":
-                        return AzureAuthorityHosts.AzureGovernment;
-                    default:
-                        return AzureAuthorityHosts.AzurePublicCloud;
-                }
-            }
-        }
+        private AzureProperties _jobProperties { get; set; }
+
+        private ResourceIdentifier? _appGatewayResourceId { get; set; }
 
         public AzureAppGatewayClient(AzureProperties properties)
         {
-            Log = LogHandler.GetClassLogger<AzureAppGatewayClient>();
-            Log.LogDebug("Initializing Azure App Services client");
-            _azureCloud = properties.AzureCloud;
-
-            // Construct Azure Resource Management client using ClientSecretCredential based on properties inside AzureProperties
-            ArmClient = new ArmClient(
-                            new ClientSecretCredential(properties.TenantId, properties.ApplicationId, properties.ClientSecret, 
-                                new ClientSecretCredentialOptions() { AuthorityHost = AzureCloudEndpoint, AdditionallyAllowedTenants = { "*" } }));
-
-            // Get subscription resource defined by resource ID
-            Subscription = ArmClient.GetDefaultSubscription();
-            Log.LogDebug("Found subscription called \"{SubscriptionDisplayName}\" ({SubscriptionId})",
-                Subscription.Data.DisplayName, Subscription.Data.SubscriptionId);
+            _jobProperties = properties;
+            _logger = LogHandler.GetClassLogger<AzureAppGatewayClient>();
+            _logger.LogDebug("Initializing Azure App Services client");            
+            _appGatewayResourceId = properties.StorePath != null ? new ResourceIdentifier(properties.StorePath) : null;
         }
 
-        private ILogger Log { get; }
-        private ArmClient ArmClient { get; }
-        private SubscriptionResource Subscription { get; }
-
-        public ResourceIdentifier AppGatewayResourceId
+        private ApplicationGatewayCollection GetAppGatewayParentCollection()
         {
-            set
+            // Use subscription resource to get resource group resource that contains App Gateway
+            var subscriptionResourceIdentifier = new ResourceIdentifier(_appGatewayResourceId.SubscriptionId);
+            var subscriptionResource = _armClient.GetSubscriptionResource(subscriptionResourceIdentifier);
+            ResourceGroupResource resourceGroupResource = subscriptionResource.GetResourceGroup(_appGatewayResourceId.ResourceGroupName);
+            return resourceGroupResource.GetApplicationGateways();
+        }
+
+        internal protected virtual ArmClient getArmClient(string tenantId)
+        {
+            TokenCredential credential;
+            var credentialOptions = new DefaultAzureCredentialOptions { AuthorityHost = _jobProperties.AzureCloudEndpoint, AdditionallyAllowedTenants = { "*" } };
             {
-                ApplicationGatewayResource appGatewayResource = ArmClient.GetApplicationGatewayResource(value).Get();
-                Log.LogDebug("Found App Gateway called \"{AppGatewayName}\" ({AppGatewayId})",
-                    appGatewayResource.Data.Name, appGatewayResource.Id);
-                _appGatewayResourceId = value;
+                _logger.LogTrace("getting credentials for a service principal identity");
+                credential = new ClientSecretCredential(tenantId, _jobProperties.ApplicationId, _jobProperties.ClientSecret, credentialOptions);
+                _logger.LogTrace("got credentials for service principal identity", credential);
+            }
+
+            _mgmtClient = new ArmClient(credential);
+            _logger.LogTrace("created management client", _mgmtClient);
+            return _mgmtClient;
+        }
+
+        internal protected virtual ArmClient _armClient
+        {
+            get
+            {
+                if (_mgmtClient != null)
+                {
+                    _logger.LogTrace("getting previously initialized management client");
+                    return _mgmtClient;
+                }
+                return getArmClient(_jobProperties.TenantId);
             }
         }
 
-        private ResourceIdentifier _appGatewayResourceId;
-
-        private ApplicationGatewayCollection GetAppGatewayCollection()
-        {
-            // Use subscription resource to get resource group resource that contains App Gateway
-            ResourceGroupResource resourceGroupResource = Subscription.GetResourceGroup(_appGatewayResourceId.ResourceGroupName);
-            return resourceGroupResource.GetApplicationGateways();
-        }
+        protected virtual ArmClient _mgmtClient { get; set; }
 
         public IEnumerable<CurrentInventoryItem> GetAppGatewaySslCertificates()
         {
             ApplicationGatewayResource appGatewayResource =
-                ArmClient.GetApplicationGatewayResource(_appGatewayResourceId).Get();
-            Log.LogDebug("Getting SSL certificates from App Gateway called \"{AppGatewayName}\"", appGatewayResource.Data.Name);
+                _armClient.GetApplicationGatewayResource(_appGatewayResourceId).Get();
+            _logger.LogDebug($"Getting SSL certificates from App Gateway called \"{appGatewayResource.Data.Name}\"");
+            _logger.LogDebug($"There are {appGatewayResource.Data.SslCertificates.Count()} certificates in the response.");
             List<CurrentInventoryItem> inventoryItems = new List<CurrentInventoryItem>();
 
             foreach (ApplicationGatewaySslCertificate certObject in appGatewayResource.Data.SslCertificates)
@@ -129,18 +122,18 @@ namespace Keyfactor.Extensions.Orchestrator.AzureAppGateway.Client
                     UseChainLevel = true,
                     Certificates = list
                 };
-                Log.LogDebug("    Found certificate called \"{CertificateName}\" ({ResourceId})", certObject.Name, certObject.Id);
+                _logger.LogDebug($"Found certificate called \"{certObject.Name}\" ({certObject.Id})");
                 inventoryItems.Add(inventoryItem);
             }
-            Log.LogDebug("Found {CertificateCount} certificates in app gateway", inventoryItems.Count);
+            _logger.LogDebug($"Found {inventoryItems.Count()} certificates in app gateway");
             return inventoryItems;
         }
 
         public ApplicationGatewaySslCertificate AddAppGatewaySslCertificate(string certificateName, string certificateData, string certificatePassword, string httpListenerName = "")
         {
             ApplicationGatewayResource appGatewayResource =
-                ArmClient.GetApplicationGatewayResource(_appGatewayResourceId).Get();
-            Log.LogDebug("Adding SSL certificate to App Gateway called \"{AppGatewayName}\"", appGatewayResource.Data.Name);
+                _armClient.GetApplicationGatewayResource(_appGatewayResourceId).Get();
+            _logger.LogDebug($"Adding SSL certificate to App Gateway called \"{appGatewayResource.Data.Name}\"");
 
             // Create new certificate object with certificate data
             ApplicationGatewaySslCertificate gatewaySslCertificate = new ApplicationGatewaySslCertificate
@@ -155,8 +148,8 @@ namespace Keyfactor.Extensions.Orchestrator.AzureAppGateway.Client
             appGatewayResource.Data.SslCertificates.Add(gatewaySslCertificate);
 
             // Update the App Gateway resource
-            appGatewayResource = GetAppGatewayCollection().CreateOrUpdate(WaitUntil.Completed, appGatewayResource.Data.Name, appGatewayResource.Data).WaitForCompletion();
-            Log.LogDebug("Added SSL certificate called \"{CertificateName}\" to App Gateway called \"{AppGatewayName}\"", certificateName, appGatewayResource.Data.Name);
+            appGatewayResource = GetAppGatewayParentCollection().CreateOrUpdate(WaitUntil.Completed, appGatewayResource.Data.Name, appGatewayResource.Data).WaitForCompletion();
+            _logger.LogDebug($"Added SSL certificate called \"{certificateName}\" to App Gateway called \"{appGatewayResource.Data.Name}\"");
 
             ApplicationGatewaySslCertificate certificateObject = appGatewayResource.Data.SslCertificates.FirstOrDefault(cert => cert.Name == certificateName);
 
@@ -173,7 +166,7 @@ namespace Keyfactor.Extensions.Orchestrator.AzureAppGateway.Client
                 // If we fail to update the listener, we want to remove the certificate from the gateway.
                 // Otherwise, we'll have a certificate in the gateway that isn't being used and existing
                 // in a limbo state.
-                Log.LogWarning("Failed to update listener with new certificate. Removing certificate from App Gateway.");
+                _logger.LogWarning("Failed to update listener with new certificate. Removing certificate from App Gateway.");
                 RemoveAppGatewaySslCertificate(certificateName);
                 throw;
             }
@@ -184,14 +177,14 @@ namespace Keyfactor.Extensions.Orchestrator.AzureAppGateway.Client
         public void RemoveAppGatewaySslCertificate(string certificateName, string replacementHttpListenerCertificateName = "")
         {
             ApplicationGatewayResource appGatewayResource =
-                ArmClient.GetApplicationGatewayResource(_appGatewayResourceId).Get();
-            Log.LogDebug("Removing SSL certificate called \"{CertificateName}\" from App Gateway called \"{AppGatewayName}\"", certificateName, appGatewayResource.Data.Name);
+                _armClient.GetApplicationGatewayResource(_appGatewayResourceId).Get();
+            _logger.LogDebug($"Removing SSL certificate called \"{certificateName}\" from App Gateway called \"{appGatewayResource.Data.Name}\"");
 
             // Find the certificate object called certificateName
             ApplicationGatewaySslCertificate gatewaySslCertificate = appGatewayResource.Data.SslCertificates.FirstOrDefault(c => c.Name == certificateName);
             if (gatewaySslCertificate == null)
             {
-                Log.LogDebug("Certificate called \"{CertificateName}\" not found in App Gateway called \"{AppGatewayName}\"", certificateName, appGatewayResource.Data.Name);
+                _logger.LogDebug($"Certificate called \"{certificateName}\" not found in App Gateway called \"{appGatewayResource.Data.Name}\"");
                 return;
             }
 
@@ -217,15 +210,15 @@ namespace Keyfactor.Extensions.Orchestrator.AzureAppGateway.Client
                 if (newCertificate == null)
                 {
                     string error = $"Certificate called \"{certificateName}\" is in use by listener \"{listener.Name}\" and no other certificates are available for reassignment.";
-                    Log.LogError(error);
+                    _logger.LogError(error);
                     throw new Exception(error);
                 }
                 // Reassign the listener to use the new certificate
-                Log.LogDebug("Certificate called \"{CertificateName}\" is in use by listener \"{ListenerName}\". Reassigning listener to use certificate called \"{NewCert}\"", certificateName, listener.Name, newCertificate.Name);
+                _logger.LogDebug($"Certificate called \"{certificateName}\" is in use by listener \"{listener.Name}\". Reassigning listener to use certificate called \"{newCertificate.Name}\"");
                 UpdateAppGatewayListenerCertificate(newCertificate, listener.Name);
 
                 // If update succeeded, appGatewayResource is out of date. Get it again.
-                appGatewayResource = ArmClient.GetApplicationGatewayResource(_appGatewayResourceId).Get();
+                appGatewayResource = _armClient.GetApplicationGatewayResource(_appGatewayResourceId).Get();
                 gatewaySslCertificate = appGatewayResource.Data.SslCertificates.FirstOrDefault(c => c.Name == certificateName);
             }
 
@@ -233,30 +226,30 @@ namespace Keyfactor.Extensions.Orchestrator.AzureAppGateway.Client
             appGatewayResource.Data.SslCertificates.Remove(gatewaySslCertificate);
 
             // Update the App Gateway resource
-            GetAppGatewayCollection().CreateOrUpdate(WaitUntil.Completed, appGatewayResource.Data.Name, appGatewayResource.Data);
+            GetAppGatewayParentCollection().CreateOrUpdate(WaitUntil.Completed, appGatewayResource.Data.Name, appGatewayResource.Data);
 
-            Log.LogDebug("Successfully removed SSL certificate called \"{CertificateName}\" from App Gateway called \"{AppGatewayName}\"", certificateName, appGatewayResource.Data.Name);
+            _logger.LogDebug($"Successfully removed SSL certificate called \"{certificateName}\" from App Gateway called \"{appGatewayResource.Data.Name}\"");
         }
 
         public void ReplaceAppGatewayCertificate(string certificateName, string certificateData, string certificatePassword)
         {
-            Log.LogDebug("Replacing SSL certificate called \"{CertificateName}\" in App Gateway called \"{AppGatewayName}\"", certificateName, _appGatewayResourceId.Name);
+            _logger.LogDebug($"Replacing SSL certificate called \"{certificateName}\" in App Gateway called \"{_appGatewayResourceId.Name}\"");
             // If the certificate exists, we want to remove it and add it again
             string tempAlias = "";
             string httpListenerName = AppGatewaySslCertificateIsAttachedToListener(certificateName);
             if (AppGatewaySslCertificateExists(certificateName))
             {
-                Log.LogDebug("Certificate called \"{CertificateName}\" already exists\". Replacing it.", certificateName);
+                _logger.LogDebug($"Certificate called \"{certificateName}\" already exists\". Replacing it.");
                 // First, add the certificate to the App Gateway under a random alias
                 tempAlias = Guid.NewGuid().ToString();
 
                 // Specify the listener name so that the certificate is assigned to the listener
-                Log.LogDebug("Adding temporary certificate called \"{TempAlias}\"", tempAlias);
+                _logger.LogDebug($"Adding temporary certificate called \"{tempAlias}\"");
 
                 AddAppGatewaySslCertificate(tempAlias, certificateData, certificatePassword, httpListenerName);
 
                 // Remove the certificate with the original alias
-                Log.LogDebug("Removing original certificate called \"{CertificateName}\"", certificateName);
+                _logger.LogDebug($"Removing original certificate called \"{certificateName}\"");
                 RemoveAppGatewaySslCertificate(certificateName);
             }
 
@@ -266,20 +259,20 @@ namespace Keyfactor.Extensions.Orchestrator.AzureAppGateway.Client
             if (string.IsNullOrEmpty(tempAlias)) return;
 
             // At this point, the temporary certificate shouldn't be assigned to any listeners
-            Log.LogDebug("Removing temporary certificate called \"{TempAlias}\"", tempAlias);
+            _logger.LogDebug($"Removing temporary certificate called \"{tempAlias}\"");
             RemoveAppGatewaySslCertificate(tempAlias);
         }
 
         public void UpdateAppGatewayListenerCertificate(ApplicationGatewaySslCertificate certificate, string listenerName)
         {
-            ApplicationGatewayResource appGatewayResource = ArmClient.GetApplicationGatewayResource(_appGatewayResourceId).Get();
+            ApplicationGatewayResource appGatewayResource = _armClient.GetApplicationGatewayResource(_appGatewayResourceId).Get();
 
             // First, verify that certificate exists in App Gateway
             if (!AppGatewaySslCertificateExists(certificate.Name))
             {
                 string error =
                     $"Certificate with name \"{certificate.Name}\" does not exist in App Gateway \"{appGatewayResource.Data.Name}\"";
-                Log.LogError(error);
+                _logger.LogError(error);
                 throw new Exception(error);
             }
 
@@ -291,29 +284,29 @@ namespace Keyfactor.Extensions.Orchestrator.AzureAppGateway.Client
             {
                 string error =
                     $"Listener with name \"{listenerName}\" does not exist in App Gateway \"{appGatewayResource.Data.Name}\"";
-                Log.LogError(error);
+                _logger.LogError(error);
                 throw new Exception(error);
             }
-            Log.LogDebug("Updating listener \"{ListenerName}\" to use certificate \"{CertificateName}\"", listenerName, certificate.Name);
+            _logger.LogDebug($"Updating listener \"{listenerName}\" to use certificate \"{certificate.Name}\"");
 
             // Update the App Gateway resource
             appGatewayResource.Data.HttpListeners.Remove(appGatewayResource.Data.HttpListeners.FirstOrDefault(l => l.Name == listenerName));
             appGatewayResource.Data.HttpListeners.Add(listener);
 
-            GetAppGatewayCollection().CreateOrUpdate(WaitUntil.Completed, appGatewayResource.Data.Name, appGatewayResource.Data);
+            GetAppGatewayParentCollection().CreateOrUpdate(WaitUntil.Completed, appGatewayResource.Data.Name, appGatewayResource.Data);
 
-            Log.LogDebug("Successfully updated listener \"{ListenerName}\" with certificate called \"{CertificateName}\".", listenerName, certificate.Name);
+            _logger.LogDebug($"Successfully updated listener \"{listenerName}\" with certificate called \"{certificate.Name}\".");
         }
 
         public bool AppGatewaySslCertificateExists(string certificateName)
         {
-            ApplicationGatewayResource appGatewayResource = ArmClient.GetApplicationGatewayResource(_appGatewayResourceId).Get();
+            ApplicationGatewayResource appGatewayResource = _armClient.GetApplicationGatewayResource(_appGatewayResourceId).Get();
             return appGatewayResource.Data.SslCertificates.FirstOrDefault(c => c.Name == certificateName) != null;
         }
 
         public string AppGatewaySslCertificateIsAttachedToListener(string certificateName)
         {
-            ApplicationGatewayResource appGatewayResource = ArmClient.GetApplicationGatewayResource(_appGatewayResourceId).Get();
+            ApplicationGatewayResource appGatewayResource = _armClient.GetApplicationGatewayResource(_appGatewayResourceId).Get();
             ApplicationGatewaySslCertificate certificate = appGatewayResource.Data.SslCertificates.FirstOrDefault(c => c.Name == certificateName);
             if (certificate == null) return "";
             ApplicationGatewayHttpListener listener = appGatewayResource.Data.HttpListeners.FirstOrDefault(l => l.SslCertificateId == certificate.Id);
@@ -322,16 +315,33 @@ namespace Keyfactor.Extensions.Orchestrator.AzureAppGateway.Client
 
         public IEnumerable<string> DiscoverAppGateways()
         {
-            // Build a list of all App Gateway IDs in every resource group
-            List<string> appGatewayIds = new List<string>();
-            foreach (ResourceGroupResource rg in Subscription.GetResourceGroups().GetAll())
+            var appGatewayResourceIds = new List<string>();
+
+            _jobProperties.TenantIdsForDiscovery.ForEach(tenantId =>
             {
-                appGatewayIds.AddRange(rg.GetApplicationGateways().GetAll().Select(appGateway => appGateway.Data.Id.ToString()));
-            }
+                try
+                {
+                    // create a new ArmClient for each tenant..
+                    var armClient = getArmClient(tenantId);
+                    var subscriptions = armClient.GetSubscriptions();
+                    // for each subscription in that tenant.. 
+                    foreach (var subscriptionResource in subscriptions)
+                    {
+                        _logger.LogDebug($"Searching for Application Gateways in tenant ID {tenantId} and subscription ID {subscriptionResource.Data.SubscriptionId}");
+                        // get all of the application gateways
+                        var appGateways = subscriptionResource.GetApplicationGateways().Select(ag => ag.Data.Id.ToString());
+                        appGatewayResourceIds.AddRange(appGateways);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex, $"Error performing discovery on tenantId {tenantId}");
+                }
+            });
 
-            Log.LogDebug("Discovered {AppGatewayCount} App Gateways", appGatewayIds.Count);
+            _logger.LogDebug($"Discovered {appGatewayResourceIds.Count()} App Gateways");
 
-            return appGatewayIds;
+            return appGatewayResourceIds;
         }
     }
 }

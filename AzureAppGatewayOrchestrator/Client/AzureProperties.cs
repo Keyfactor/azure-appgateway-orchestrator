@@ -13,6 +13,9 @@
 // limitations under the License.
 
 using Azure.Core;
+using Azure.Identity;
+using System;
+using System.Collections.Generic;
 
 namespace Keyfactor.Extensions.Orchestrator.AzureAppGateway.Client
 {
@@ -22,6 +25,25 @@ namespace Keyfactor.Extensions.Orchestrator.AzureAppGateway.Client
         public string ApplicationId { get; set; }
         public string ClientSecret { get; set; }
         public string AzureCloud { get; set; }
-        public string PrivateEndpoint { get; set; }
+        public string StorePath { get; set; }
+        public List<string> TenantIdsForDiscovery { get; set; }
+        public Uri AzureCloudEndpoint
+        {
+            get
+            {
+                switch (AzureCloud)
+                {
+
+                    case "china":
+                        return AzureAuthorityHosts.AzureChina;
+                    case "germany":
+                        return AzureAuthorityHosts.AzureGermany;
+                    case "government":
+                        return AzureAuthorityHosts.AzureGovernment;
+                    default:
+                        return AzureAuthorityHosts.AzurePublicCloud;
+                }
+            }
+        }
     }
 }

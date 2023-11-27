@@ -1,22 +1,15 @@
 {
   "$schema": "https://keyfactor.github.io/integration-manifest-schema.json",
-  "integration_type": "orchestrator",
-  "name": "Azure Application Gateway Orchestrator",
-  "status": "production",
-  "update_catalog": true,
-  "link_github": true,
-  "support_level": "kf-community",
-  "description": "The Azure Application Gateway Orchestrator extension acts as a proxy between Keyfactor and Azure that allows Keyfactor to manage Application Gateway certificates.",
   "about": {
     "orchestrator": {
       "win": {
+        "platformSupport": "Unused",
         "supportsCreateStore": false,
         "supportsDiscovery": true,
+        "supportsInventory": true,
         "supportsManagementAdd": true,
         "supportsManagementRemove": true,
-        "supportsReenrollment": false,
-        "supportsInventory": true,
-        "platformSupport": "Unused"
+        "supportsReenrollment": false
       },
       "linux": {
         "supportsCreateStore": false,
@@ -27,89 +20,89 @@
         "supportsInventory": true,
         "platformSupport": "Unused"
       },
-      "store_types": {
-        "AzureAppGW" : {
-          "Name": "Azure Application Gateway",
-          "ShortName": "AzureAppGW",
-          "Capability": "AzureAppGW",
-          "LocalStore": false,
-          "SupportedOperations": {
-            "Add": true,
-            "Create": false,
-            "Discovery": true,
-            "Enrollment": false,
-            "Remove": true
-          }
-        },
-        "Properties": [
-          {
-            "Name": "ServerUsername",
-            "DisplayName": "Server Username",
-            "Type": "Secret",
-            "DependsOn": null,
-            "DefaultValue": null,
-            "Required": true
-          },
-          {
-            "Name": "ServerPassword",
-            "DisplayName": "Server Password",
-            "Type": "Secret",
-            "DependsOn": null,
-            "DefaultValue": null,
-            "Required": true
-          },
-          {
-            "Name": "ServerUseSsl",
-            "DisplayName": "Use SSL",
-            "Type": "Bool",
-            "DependsOn": null,
-            "DefaultValue": "true",
-            "Required": false
-          },
-          {
-            "Name": "AzureCloud",
-            "DisplayName": "Azure Cloud",
-            "Type": "MultipleChoice",
-            "DependsOn": "",
-            "DefaultValue": "public,china,germany,government",
-            "Required": false
-          },
-          {
-            "Name": "PrivateEndpoint",
-            "DisplayName": "Private KeyVault Endpoint",
-            "Type": "String",
-            "DependsOn": "",
-            "DefaultValue": null,
-            "Required": false
-          }
-        ],
-        "EntryParameters": [
-          {
-            "Name": "HTTPListenerName",
-            "DisplayName": "HTTP Listener Name",
-            "Type": "String",
-            "RequiredWhen": {
-              "HasPrivateKey": false,
-              "OnAdd": false,
-              "OnRemove": false,
-              "OnReenrollment": false
+      "store_types": [
+        {
+          "AzureAppGW": {
+            "Name": "Azure Application Gateway",
+            "ShortName": "AzureAppGW",
+            "Capability": "AzureAppGW",
+            "LocalStore": false,
+            "SupportedOperations": {
+              "Add": true,
+              "Create": false,
+              "Discovery": true,
+              "Enrollment": false,
+              "Remove": true
             }
-          }
-        ],
-        "PasswordOptions": {
-          "EntrySupported": false,
-          "StoreRequired": false,
-          "Style": "Default"
-        },
-        "PrivateKeyAllowed": "Required",
-        "ServerRequired": true,
-        "PowerShell": false,
-        "BlueprintAllowed": false,
-        "CustomAliasAllowed": "Required",
-        "ServerRegistration": 13,
-        "InventoryEndpoint": "/AnyInventory/Update"
-
-      }
+          },
+          "Properties": [
+            {
+              "Name": "ServerUsername",
+              "DisplayName": "Server Username",
+              "Type": "Secret",
+              "DependsOn": null,
+              "DefaultValue": null,
+              "Required": true
+            },
+            {
+              "Name": "ServerPassword",
+              "DisplayName": "Server Password",
+              "Type": "Secret",
+              "DependsOn": null,
+              "DefaultValue": null,
+              "Required": true
+            },
+            {
+              "Name": "ServerUseSsl",
+              "DisplayName": "Use SSL",
+              "Type": "Bool",
+              "DependsOn": null,
+              "DefaultValue": "true",
+              "Required": false
+            },
+            {
+              "Name": "AzureCloud",
+              "DisplayName": "Azure Cloud",
+              "Type": "MultipleChoice",
+              "DependsOn": "",
+              "DefaultValue": "public,china,germany,government",
+              "Required": false
+            }
+          ],
+          "EntryParameters": [
+            {
+              "Name": "HTTPListenerName",
+              "DisplayName": "HTTP Listener Name",
+              "Type": "String",
+              "RequiredWhen": {
+                "HasPrivateKey": false,
+                "OnAdd": false,
+                "OnRemove": false,
+                "OnReenrollment": false
+              }
+            }
+          ],
+          "PasswordOptions": {
+            "EntrySupported": false,
+            "StoreRequired": false,
+            "Style": "Default"
+          },
+          "PrivateKeyAllowed": "Required",
+          "ServerRequired": true,
+          "PowerShell": false,
+          "BlueprintAllowed": false,
+          "CustomAliasAllowed": "Required",
+          "ServerRegistration": 13,
+          "InventoryEndpoint": "/AnyInventory/Update"
+        }
+      ]
     }
-  }
+  },
+  "description": "The Azure Application Gateway Orchestrator extension acts as a proxy between Keyfactor and Azure that allows Keyfactor to manage Application Gateway certificates.",
+  "integration_type": "orchestrator",
+  "link_github": true,
+  "name": "Azure Application Gateway Orchestrator",
+  "status": "production",
+  "support_level": "kf-community",
+  "update_catalog": true
 }

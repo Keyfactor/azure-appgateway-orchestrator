@@ -27,6 +27,7 @@
         "supportsInventory": true,
         "platformSupport": "Unused"
       },
+      "UOFramework": "10.1",
       "store_types": [
         {
           "Name": "Azure Application Gateway",

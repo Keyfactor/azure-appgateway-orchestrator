@@ -6,6 +6,7 @@
   "update_catalog": true,
   "link_github": true,
   "support_level": "kf-community",
+  "release_dir": "AzureAppGatewayOrchestrator\\bin\\Release",
   "description": "The Azure Application Gateway Orchestrator extension acts as a proxy between Keyfactor and Azure that allows Keyfactor to manage Application Gateway certificates.",
   "about": {
     "orchestrator": {
@@ -27,8 +28,9 @@
         "supportsInventory": true,
         "platformSupport": "Unused"
       },
-      "store_types": {
-        "AzureAppGW" : {
+      "UOFramework": "10.1",
+      "store_types": [
+        {
           "Name": "Azure Application Gateway",
           "ShortName": "AzureAppGW",
           "Capability": "AzureAppGW",
@@ -39,61 +41,60 @@
             "Discovery": true,
             "Enrollment": false,
             "Remove": true
-          }
-        },
-        "Properties": [
-          {
-            "Name": "ServerUsername",
-            "DisplayName": "Server Username",
-            "Type": "Secret",
-            "DependsOn": null,
-            "DefaultValue": null,
-            "Required": true
           },
-          {
-            "Name": "ServerPassword",
-            "DisplayName": "Server Password",
-            "Type": "Secret",
-            "DependsOn": null,
-            "DefaultValue": null,
-            "Required": true
-          },
-          {
-            "Name": "ServerUseSsl",
-            "DisplayName": "Use SSL",
-            "Type": "Bool",
-            "DependsOn": null,
-            "DefaultValue": "true",
-            "Required": false
-          }
-        ],
-        "EntryParameters": [
-          {
-            "Name": "HTTPListenerName",
-            "DisplayName": "HTTP Listener Name",
-            "Type": "String",
-            "RequiredWhen": {
-              "HasPrivateKey": false,
-              "OnAdd": false,
-              "OnRemove": false,
-              "OnReenrollment": false
+          "Properties": [
+            {
+              "Name": "ServerUsername",
+              "DisplayName": "Server Username",
+              "Type": "Secret",
+              "DependsOn": null,
+              "DefaultValue": null,
+              "Required": true
+            },
+            {
+              "Name": "ServerPassword",
+              "DisplayName": "Server Password",
+              "Type": "Secret",
+              "DependsOn": null,
+              "DefaultValue": null,
+              "Required": true
+            },
+            {
+              "Name": "ServerUseSsl",
+              "DisplayName": "Use SSL",
+              "Type": "Bool",
+              "DependsOn": null,
+              "DefaultValue": "true",
+              "Required": false
             }
-          }
-        ],
-        "PasswordOptions": {
-          "EntrySupported": false,
-          "StoreRequired": false,
-          "Style": "Default"
-        },
-        "PrivateKeyAllowed": "Required",
-        "ServerRequired": true,
-        "PowerShell": false,
-        "BlueprintAllowed": false,
-        "CustomAliasAllowed": "Required",
-        "ServerRegistration": 13,
-        "InventoryEndpoint": "/AnyInventory/Update"
-
-      }
+          ],
+          "EntryParameters": [
+            {
+              "Name": "HTTPListenerName",
+              "DisplayName": "HTTP Listener Name",
+              "Type": "String",
+              "RequiredWhen": {
+                "HasPrivateKey": false,
+                "OnAdd": false,
+                "OnRemove": false,
+                "OnReenrollment": false
+              }
+            }
+          ],
+          "PasswordOptions": {
+            "EntrySupported": false,
+            "StoreRequired": false,
+            "Style": "Default"
+          },
+          "PrivateKeyAllowed": "Required",
+          "ServerRequired": true,
+          "PowerShell": false,
+          "BlueprintAllowed": false,
+          "CustomAliasAllowed": "Required",
+          "ServerRegistration": 13,
+          "InventoryEndpoint": "/AnyInventory/Update"
+        }
+      ]
     }
   }
 }

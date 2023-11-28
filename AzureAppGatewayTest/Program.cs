@@ -54,10 +54,7 @@ namespace AzureAppGatewayTest
                 ClientSecret = Environment.GetEnvironmentVariable("AZURE_CLIENT_SECRET") ?? string.Empty
             };
 
-            Client = new AzureAppGatewayClient(properties)
-            {
-                AppGatewayResourceId = new ResourceIdentifier(Environment.GetEnvironmentVariable("AZURE_GATEWAY_RESOURCE_ID") ?? string.Empty)
-            };
+            Client = new AzureAppGatewayClient(properties);            
         }
 
         private AzureAppGatewayClient Client { get; }
@@ -67,7 +64,7 @@ namespace AzureAppGatewayTest
             Console.Write("Getting App Gateway Certificates...\n");
             foreach (CurrentInventoryItem certInv in Client.GetAppGatewaySslCertificates())
             {
-                Console.Write($"    Found certificate called {certInv.Alias}\n");
+                Console.Write($"Found certificate called {certInv.Alias}\n");
             }
         }
 

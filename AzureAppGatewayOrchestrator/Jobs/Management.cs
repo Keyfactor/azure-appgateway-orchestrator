@@ -13,7 +13,6 @@
 // limitations under the License.
 
 using System;
-using Azure.ResourceManager.Network.Models;
 using Keyfactor.Logging;
 using Keyfactor.Orchestrators.Common.Enums;
 using Keyfactor.Orchestrators.Extensions;

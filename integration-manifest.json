@@ -1,5 +1,13 @@
 {
   "$schema": "https://keyfactor.github.io/integration-manifest-schema.json",
+  "integration_type": "orchestrator",
+  "name": "Azure Application Gateway Orchestrator",
+  "status": "production",
+  "update_catalog": true,
+  "link_github": true,
+  "support_level": "kf-community",
+  "release_dir": "AzureAppGatewayOrchestrator\\bin\\Release",
+  "description": "The Azure Application Gateway Orchestrator extension acts as a proxy between Keyfactor and Azure that allows Keyfactor to manage Application Gateway certificates.",
   "about": {
     "orchestrator": {
       "win": {
@@ -20,20 +28,19 @@
         "supportsInventory": true,
         "platformSupport": "Unused"
       },
+      "UOFramework": "10.1",
       "store_types": [
         {
-          "AzureAppGW": {
-            "Name": "Azure Application Gateway",
-            "ShortName": "AzureAppGW",
-            "Capability": "AzureAppGW",
-            "LocalStore": false,
-            "SupportedOperations": {
-              "Add": true,
-              "Create": false,
-              "Discovery": true,
-              "Enrollment": false,
-              "Remove": true
-            }
+          "Name": "Azure Application Gateway",
+          "ShortName": "AzureAppGW",
+          "Capability": "AzureAppGW",
+          "LocalStore": false,
+          "SupportedOperations": {
+            "Add": true,
+            "Create": false,
+            "Discovery": true,
+            "Enrollment": false,
+            "Remove": true
           },
           "Properties": [
             {
@@ -98,11 +105,4 @@
       ]
     }
   },
-  "description": "The Azure Application Gateway Orchestrator extension acts as a proxy between Keyfactor and Azure that allows Keyfactor to manage Application Gateway certificates.",
-  "integration_type": "orchestrator",
-  "link_github": true,
-  "name": "Azure Application Gateway Orchestrator",
-  "status": "production",
-  "support_level": "kf-community",
-  "update_catalog": true
 }

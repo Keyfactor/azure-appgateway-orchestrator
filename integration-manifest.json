@@ -29,6 +29,7 @@
         "platformSupport": "Unused"
       },
       "UOFramework": "10.1",
+      "keyfactor_platform_version": "9.10",
       "store_types": [
         {
           "Name": "Azure Application Gateway",

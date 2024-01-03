@@ -16,7 +16,7 @@ The Universal Orchestrator is the successor to the Windows Orchestrator. This Or
 
 ## Support for Azure Application Gateway Orchestrator
 
-Azure Application Gateway Orchestrator is open source and there is **no SLA** for this tool/library/client. Keyfactor will address issues as resources become available. Keyfactor customers may request escalation by opening up a support ticket through their Keyfactor representative.
+Azure Application Gateway Orchestrator is open source and supported on best effort level for this tool/library/client.  This means customers can report Bugs, Feature Requests, Documentation amendment or questions as well as requests for customer information required for setup that needs Keyfactor access to obtain. Such requests do not follow normal SLA commitments for response or resolution. If you have a support issue, please open a support ticket via the Keyfactor Support Portal at https://support.keyfactor.com/
 
 ###### To report a problem or suggest a new feature, use the **[Issues](../../issues)** tab. If you want to contribute actual bug fixes or proposed enhancements, use the **[Pull requests](../../pulls)** tab.
 
@@ -25,6 +25,10 @@ Azure Application Gateway Orchestrator is open source and there is **no SLA** fo
 
 
 
+
+## Keyfactor Version Supported
+
+The minimum version of the Keyfactor Universal Orchestrator Framework needed to run this version of the extension is 10.1
 
 ## Platform Specific Notes
 
@@ -111,6 +115,22 @@ by Keyfactor Orchestrators. To create the Azure Application Gateway Certificate 
          "Required": true
        },
        {
+         "Name": "AzureCloud",
+         "DisplayName": "Azure Cloud",
+         "Type": "MultipleChoice",
+         "DependsOn": "",
+         "DefaultValue": "public,china,germany,government",
+         "Required": false
+       },
+       {
+         "Name": "PrivateEndpoint",
+         "DisplayName": "Private KeyVault Endpoint",
+         "Type": "String",
+         "DependsOn": "",
+         "DefaultValue": null,
+         "Required": false
+       },
+       {
          "Name": "ServerUseSsl",
          "DisplayName": "Use SSL",
          "Type": "Bool",
@@ -161,8 +181,13 @@ fill the form with the following values:
 | Store Path      | Application Gateway resource ID | Azure resource ID of the application gateway in the form `/subscriptions/<subscription-id>/resourceGroups/<resource-group-name>/providers/Microsoft.Network/applicationGateways/<application-gateway-name>` |
 | Server Username | Application ID                  | Application ID of the service principal that will be used to manage the Application Gateway                                                                                                                 |
 | Server Password | Client Secret                   | Secret of the service principal that will be used to manage the Application Gateway                                                                                                                         |
+| Azure Cloud | Azure Global Cloud Authority Host | The Azure Cloud field, if necessary, should contain one of the following values: "china, germany, government".  This is the Azure Cloud instance your organization uses.  If using the standard "public" cloud, this field can be left blank or omitted entirely from the store type definition. |
+| Private Endpoint | Azure Private Endpoint URL prefix | The Private Endpoint field should be used if you have a custom url assigned to your keyvault resources and they are not accessible via the standard endpoint associated with the Azure Cloud instance (\*.vault.azure.net, \*.vault.azure.cn, etc.).  This field should contain the base url for your vault instance(s), excluding the vault name.  If using the standard endpoints corresponding to your Azure Cloud instance, this field can be left blank or omitted entirely from the store type definition.|
 
 For the discovery job, populate the _Directories to search_ with any value. The extension will discover all Application Gateways accessible by the Azure Service Principal.
+
+> :warning: Discovery jobs are not supported for KeyVaults located outside of the Azure Public cloud or Keyvaults accessed via a private url endpoint.  
+> All other job types implemented by this integration are supported for alternate Azure clouds and private endpoints.
 
 ### Important note about Certificate Renewal
 The Azure Application Gateway Orchestrator extension supports certificate renewal. If a certificate is renewed and is associated with an HTTP Listener,

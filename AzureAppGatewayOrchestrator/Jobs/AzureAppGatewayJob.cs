@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using Azure.Core;
 using Keyfactor.Extensions.Orchestrator.AzureAppGateway.Client;
@@ -34,18 +35,19 @@ namespace Keyfactor.Extensions.Orchestrator.AzureAppGateway.Jobs
             logger.LogDebug($"Certificate Store Configuration: {JsonConvert.SerializeObject(details)}");
             logger.LogDebug("Initializing AzureAppGatewayClient");
             dynamic properties = JsonConvert.DeserializeObject(details.Properties);
-            
+
             AzureProperties azureProperties = new AzureProperties
             {
                 TenantId = details.ClientMachine,
                 ApplicationId = properties?.ServerUsername,
-                ClientSecret = properties?.ServerPassword
+                ClientSecret = properties?.ServerPassword,
+                AzureCloud = properties?.AzureCloud,
+                StorePath = details?.StorePath                
             };
-            
-            GatewayClient = new AzureAppGatewayClient(azureProperties)
-            {
-                AppGatewayResourceId = new ResourceIdentifier(details.StorePath)
-            };
+
+            azureProperties.AzureCloud = azureProperties.AzureCloud?.ToLower();
+
+            GatewayClient = new AzureAppGatewayClient(azureProperties);
         }
 
         protected void Initialize(DiscoveryJobConfiguration config)
@@ -57,9 +59,28 @@ namespace Keyfactor.Extensions.Orchestrator.AzureAppGateway.Jobs
             {
                 TenantId = config.ClientMachine,
                 ApplicationId = config.ServerUsername,
-                ClientSecret = config.ServerPassword
+                ClientSecret = config.ServerPassword,
+
             };
-            
+            logger.LogTrace("Discovery job - getting tenant ids from directories to search field.");
+            azureProperties.TenantIdsForDiscovery = new List<string>();
+            var dirs = config.JobProperties?["dirs"] as string;
+            logger.LogTrace($"Directories to search: {dirs}");
+
+            if (!string.IsNullOrEmpty(dirs))
+            {
+                // parse the list of tenant ids to perform discovery on                                        
+                azureProperties.TenantIdsForDiscovery.AddRange(dirs.Split(','));
+            }
+            else
+            {
+                // if it is empty, we use the default provided Tenant Id only
+                azureProperties.TenantIdsForDiscovery.Add(azureProperties.TenantId);
+            }
+
+            azureProperties.TenantIdsForDiscovery.ForEach(tId => tId = tId.Trim());
+            azureProperties.TenantId = azureProperties.TenantId ?? azureProperties.TenantIdsForDiscovery[0];
+
             GatewayClient = new AzureAppGatewayClient(azureProperties);
         }
     }

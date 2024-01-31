@@ -2,8 +2,8 @@
 
   <PropertyGroup>
     <TargetFramework>net6.0</TargetFramework>
-    <RootNamespace>Keyfactor.Extensions.Orchestrator.AzureAppGateway</RootNamespace>
-    <AssemblyName>Keyfactor.Extensions.Orchestrators.AzureAppGW</AssemblyName>
+    <RootNamespace>AzureApplicationGatewayOrchestratorExtension</RootNamespace>
+    <AssemblyName>AzureApplicationGatewayOrchestratorExtension</AssemblyName>
     <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
     <AppendRuntimeIdentifierToOutputPath>false</AppendRuntimeIdentifierToOutputPath>
     <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
@@ -11,12 +11,14 @@
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
     <DefineConstants></DefineConstants>
-    <BaseOutputPath></BaseOutputPath>
+    <BaseOutputPath>/Users/hroszell/Documents/dev/orchestrators/uo-bootstrap/extensions/AzureAppGateway</BaseOutputPath>
+    <OutputPath>$(BaseOutputPath)</OutputPath>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="Azure.Identity" Version="1.8.0" />
     <PackageReference Include="Azure.ResourceManager.Network" Version="1.1.0" />
+    <PackageReference Include="Azure.Security.KeyVault.Secrets" Version="4.5.0" />
     <PackageReference Include="Keyfactor.Logging" Version="1.1.1" />
     <PackageReference Include="Keyfactor.Orchestrators.IOrchestratorJobExtensions" Version="0.7.0" />
     <PackageReference Include="System.Security.Cryptography.Pkcs" Version="4.5.0" />

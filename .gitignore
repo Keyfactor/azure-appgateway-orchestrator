@@ -348,3 +348,4 @@ healthchecksdb
 /cert.csr
 
 .DS_Store
+*.env

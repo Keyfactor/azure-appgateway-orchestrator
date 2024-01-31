@@ -72,19 +72,7 @@
                             "Required": false
                         }
                     ],
-                    "EntryParameters": [
-                        {
-                            "Name": "HTTPListenerName",
-                            "DisplayName": "HTTP Listener Name",
-                            "Type": "String",
-                            "RequiredWhen": {
-                                "HasPrivateKey": false,
-                                "OnAdd": false,
-                                "OnRemove": false,
-                                "OnReenrollment": false
-                            }
-                        }
-                    ],
+                    "EntryParameters": [],
                     "PasswordOptions": {
                         "EntrySupported": false,
                         "StoreRequired": false,

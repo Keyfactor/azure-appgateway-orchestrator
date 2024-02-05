@@ -29,7 +29,7 @@ public class Inventory : IInventoryJobExtension
     public string ExtensionName => "AppGwBin";
     public IAzureAppGatewayClient Client { get; set; }
 
-    ILogger _logger = LogHandler.GetClassLogger<Discovery>();
+    ILogger _logger = LogHandler.GetClassLogger<Inventory>();
 
     public JobResult ProcessJob(InventoryJobConfiguration config, SubmitInventoryUpdate cb)
     {
@@ -88,7 +88,7 @@ public class Inventory : IInventoryJobExtension
 
         _logger.LogDebug($"There are {httpsListenerCertificateBinding.Count} HTTPS listeners in App Gateway with bound certificates");
 
-        // Sacrafice spacial complexity for time complexity - this way the loop that constructs the final
+        // Sacrifice spacial complexity for time complexity - this way the loop that constructs the final
         // inventory list is O(n) instead of O(n^2)
         Dictionary<string, CurrentInventoryItem> appGatewayCertificateInventoryDict = appGatewayCertificateInventory.ToDictionary(x => x.Alias);
 
@@ -105,8 +105,21 @@ public class Inventory : IInventoryJobExtension
             {
                 // Update the inventory item with the name of the certificate bound to the HTTPS listener
                 // to be the name of the HTTPS listener
-                appGatewayCertificateInventoryDict[listenerBinding.Value].Alias = listenerBinding.Key;
-                certificateBindingInventory.Add(appGatewayCertificateInventoryDict[listenerBinding.Value]);
+                
+                // We need to make a deep copy of the original inventory item since the same certificate can be 
+                // bound to multiple HTTPS listeners
+
+                CurrentInventoryItem newItem = new()
+                {
+                    Alias = listenerBinding.Key,
+                    PrivateKeyEntry = appGatewayCertificateInventoryDict[listenerBinding.Value].PrivateKeyEntry,
+                    ItemStatus = OrchestratorInventoryItemStatus.Unknown,
+                    UseChainLevel = false,
+                    Certificates = appGatewayCertificateInventoryDict[listenerBinding.Value].Certificates,
+                    Parameters = appGatewayCertificateInventoryDict[listenerBinding.Value].Parameters
+                };
+                
+                certificateBindingInventory.Add(newItem);
 
                 _logger.LogTrace($"Added certificate [{listenerBinding.Value}] bound to HTTPS listener [{listenerBinding.Key}] to inventory");
             }

@@ -64,7 +64,8 @@ public class FakeClient : IAzureAppGatewayClient
 
     public IEnumerable<CurrentInventoryItem> GetAppGatewaySslCertificates()
     {
-        
+        _logger.LogDebug("Getting App Gateway SSL Certificates from fake app gateway");
+
         if (CertificatesAvailableOnFakeAppGateway == null)
         {
             throw new Exception("Get App Gateway SSL Certificate method failure - no inventory items set");
@@ -83,11 +84,15 @@ public class FakeClient : IAzureAppGatewayClient
             });
         }
 
+        _logger.LogDebug($"Fake client has {inventoryItems.Count} certificates in inventory");
+
         return inventoryItems;
     }
 
     public ApplicationGatewaySslCertificate AddCertificate(string certificateName, string certificateData, string certificatePassword)
     {
+        _logger.LogDebug($"Adding certificate {certificateName} to fake app gateway");
+
         if (CertificatesAvailableOnFakeAppGateway == null)
         {
             CertificatesAvailableOnFakeAppGateway = new Dictionary<string, ApplicationGatewaySslCertificate>();
@@ -105,27 +110,31 @@ public class FakeClient : IAzureAppGatewayClient
 
         CertificatesAvailableOnFakeAppGateway.Add(certificateName, cert);
 
+        _logger.LogTrace($"Fake client has {CertificatesAvailableOnFakeAppGateway.Count} certificates in inventory");
+
         return cert;
     }
 
     public void RemoveCertificate(string certificateName)
     {
-        if (CertificatesAvailableOnFakeAppGateway != null && CertificatesAvailableOnFakeAppGateway.ContainsKey(certificateName))
+        if (CertificatesAvailableOnFakeAppGateway == null || !CertificatesAvailableOnFakeAppGateway.ContainsKey(certificateName))
         {
-            // FakeClient tracks certificates bound to HTTPS listeners by 
-            // the Password field of the ApplicationGatewaySslCertificate
-            if (!string.IsNullOrWhiteSpace(CertificatesAvailableOnFakeAppGateway[certificateName].Password))
-            {
-                throw new Exception("Certificate is bound to an HTTPS listener");
-            }
-
-            _logger.LogDebug($"Removing certificate {certificateName} from fake app gateway");
-
-            CertificatesAvailableOnFakeAppGateway.Remove(certificateName);
-            return;
+            throw new Exception("Certificate not found");
         }
 
-        throw new Exception("Certificate not found");
+        // FakeClient tracks certificates bound to HTTPS listeners by 
+        // the Password field of the ApplicationGatewaySslCertificate
+        if (!string.IsNullOrWhiteSpace(CertificatesAvailableOnFakeAppGateway[certificateName].Password))
+        {
+            throw new Exception("Certificate is bound to an HTTPS listener");
+        }
+
+        _logger.LogDebug($"Removing certificate {certificateName} from fake app gateway");
+
+        CertificatesAvailableOnFakeAppGateway.Remove(certificateName);
+
+        _logger.LogTrace($"Fake client has {CertificatesAvailableOnFakeAppGateway.Count} certificates in inventory");
+        return;
     }
 
     public bool CertificateExists(string certificateName)
@@ -140,22 +149,24 @@ public class FakeClient : IAzureAppGatewayClient
 
     public ApplicationGatewaySslCertificate GetAppGatewayCertificateByName(string certificateName)
     {
-        if (CertificatesAvailableOnFakeAppGateway != null && CertificatesAvailableOnFakeAppGateway.ContainsKey(certificateName))
+        if (CertificatesAvailableOnFakeAppGateway == null || !CertificatesAvailableOnFakeAppGateway.ContainsKey(certificateName))
         {
-            return CertificatesAvailableOnFakeAppGateway[certificateName];
+            throw new Exception("Certificate not found");
         }
 
-        throw new Exception("Certificate not found");
+        _logger.LogDebug($"Getting certificate {certificateName} from fake app gateway");
+
+        return CertificatesAvailableOnFakeAppGateway[certificateName];
     }
 
     public IEnumerable<string> DiscoverApplicationGateways()
     {
-        if (AppGatewaysAvailableOnFakeTenant != null)
+        if (AppGatewaysAvailableOnFakeTenant == null)
         {
-            return AppGatewaysAvailableOnFakeTenant;
+            throw new Exception("Discover Application Gateways method failure - no app gateways set");
         }
 
-        throw new Exception("Discover Application Gateways method failure - no app gateways set");
+        return AppGatewaysAvailableOnFakeTenant;
     }
 
     public void UpdateHttpsListenerCertificate(ApplicationGatewaySslCertificate certificate, string listenerName)
@@ -164,6 +175,8 @@ public class FakeClient : IAzureAppGatewayClient
         {
             throw new Exception("Certificate not found");
         }
+
+        _logger.LogDebug($"Binding certificate {certificate.Name} to listener {listenerName}");
 
         // In Azure, only one certificate can be bound to an HTTPS listener at a time.
         // If a certificate binding already exists, remove it before binding the new certificate.
@@ -175,21 +188,18 @@ public class FakeClient : IAzureAppGatewayClient
             }
         }
 
-        _logger.LogDebug($"Binding certificate {certificate.Name} to listener {listenerName}");
-
         CertificatesAvailableOnFakeAppGateway[certificate.Name].Password = listenerName;
         return;
-
     }
 
     public bool CertificateIsBoundToHttpsListener(string certificateName)
     {
-        if (CertificatesAvailableOnFakeAppGateway != null && CertificatesAvailableOnFakeAppGateway.ContainsKey(certificateName))
+        if (CertificatesAvailableOnFakeAppGateway == null || !CertificatesAvailableOnFakeAppGateway.ContainsKey(certificateName))
         {
-            return !string.IsNullOrWhiteSpace(CertificatesAvailableOnFakeAppGateway[certificateName].Password);
+            return false; 
         }
 
-        throw new Exception("Certificate not found");
+        return !string.IsNullOrWhiteSpace(CertificatesAvailableOnFakeAppGateway[certificateName].Password);
     }
 
     public IDictionary<string, string> GetBoundHttpsListenerCertificates()
@@ -206,6 +216,7 @@ public class FakeClient : IAzureAppGatewayClient
             if (!string.IsNullOrWhiteSpace(cert.Password))
             {
                 listenerCertificates.Add(cert.Password, cert.Name);
+                _logger.LogTrace($"Fake client has certificate {cert.Name} bound to listener {cert.Password}");
             }
         }
 

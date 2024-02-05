@@ -61,7 +61,8 @@ public class Inventory : IInventoryJobExtension
 
         _logger.LogDebug($"Found {inventoryItems.Count} certificates in App Gateway");
 
-        cb.DynamicInvoke(inventoryItems);
+        //cb.DynamicInvoke(inventoryItems);
+        cb(inventoryItems);
 
         result.Result = OrchestratorJobStatusJobResult.Success;
         return result;

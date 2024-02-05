@@ -434,6 +434,54 @@ public class AzureAppGatewayOrchestrator_AzureAppGw
     }
 
     [Fact]
+    public void AzureAppGw_ManagementReplace_ProcessJob_CertificateIsBoundToHttpsListener_ReturnSuccess()
+    {
+        // Arrange
+        FakeClient client = new FakeClient
+        {
+            CertificatesAvailableOnFakeAppGateway = new Dictionary<string, ApplicationGatewaySslCertificate>
+            {
+                // The Password field is used to track certificates bound to HTTPS listeners
+                { "test", new ApplicationGatewaySslCertificate { Name = "test", Data = BinaryData.FromObjectAsJson("original-cert-data"), Password = "fake-https-listener" } }
+            }
+        };
+
+        // Set up the management job with the fake client
+        var management = new Management
+        {
+            Client = client
+        };
+
+        // Set up the management job configuration
+        var config = new ManagementJobConfiguration
+        {
+            OperationType = CertStoreOperationType.Add,
+            Overwrite = true,
+            JobCertificate = new ManagementJobCertificate
+            {
+                Alias = "test",
+                Contents = "new-certificate-data",
+                PrivateKeyPassword = "test-password"
+            },
+            JobHistoryId = 1
+        };
+
+        // Act
+        JobResult result = management.ProcessJob(config);
+
+        // Assert
+        Assert.Equal(OrchestratorJobStatusJobResult.Success, result.Result);
+        Assert.Equal(1, result.JobHistoryId);
+        if (client.CertificatesAvailableOnFakeAppGateway != null)
+        {
+            Assert.True(client.CertificatesAvailableOnFakeAppGateway.ContainsKey("test"));
+            Assert.Equal(BinaryData.FromObjectAsJson("original-cert-data").ToString(), client.CertificatesAvailableOnFakeAppGateway["test"].Data.ToString());
+        }
+
+        _logger.LogInformation("AzureAppGw_ManagementReplace_ProcessJob_CertificateIsBoundToHttpsListener_ReturnSuccess");
+    }
+
+    [Fact]
     public void AzureAppGw_ManagementReplace_ProcessJob_ValidClient_ReturnSuccess()
     {
         // Arrange
@@ -489,7 +537,7 @@ public class AzureAppGatewayOrchestrator_AzureAppGw
         var iClientSecret = Environment.GetEnvironmentVariable("AZURE_CLIENT_SECRET") ?? string.Empty;
         var iResourceId = Environment.GetEnvironmentVariable("AZURE_APP_GATEWAY_RESOURCE_ID") ?? string.Empty;
 
-        string testHostname = "example.com";
+        string testHostname = "azureappgatewayorchestratorUnitTest.com";
         string certName = "GatewayTest" + Guid.NewGuid().ToString()[..6];
         string password = "password";
 

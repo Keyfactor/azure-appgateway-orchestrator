@@ -36,12 +36,11 @@ namespace AzureApplicationGatewayOrchestratorExtension.Client;
 public class GatewayClient : IAzureAppGatewayClient
 {
     private ILogger _logger { get; set; }
-
     private ArmClient _armClient { get; set; }
-
     private TokenCredential _credential { get; set; }
-
     public ResourceIdentifier AppGatewayResourceId { get; set; }
+
+    private IDictionary<string, string> currentlyBoundAppGatewayCertificateCache { get; set; }
 
     // The Client can only be constructed by the Builder method
     // unless they use the constructor that passes a pre-configured
@@ -94,6 +93,10 @@ public class GatewayClient : IAzureAppGatewayClient
 
         public IAzureAppGatewayClientBuilder WithAzureCloud(string azureCloud)
         {
+            if (string.IsNullOrWhiteSpace(azureCloud)) 
+            {
+                azureCloud = "public";
+            }
 
             switch (azureCloud.ToLower())
             {
@@ -165,7 +168,16 @@ public class GatewayClient : IAzureAppGatewayClient
         _logger.LogTrace($"Retrieving secret called \"{vaultUri.Segments.Last()}\" from Azure Key Vault");
         KeyVaultSecret secret = client.GetSecret(vaultUri.Segments.Last());
 
-        string b64EncodedDerCertificate = secret.Value;
+        if (String.IsNullOrWhiteSpace(secret.Properties.ContentType) || secret.Properties.ContentType != "application/x-pkcs12")
+        {
+            throw new Exception($"Unexpected content type for secret {vaultUri.Segments.Last()}. Expected application/x-pkcs12, but got {secret.Properties.ContentType}");
+        }
+        
+        string b64EncodedPkcs12Certificate = secret.Value;
+        
+        // Convert the PKCS#12 certificate to DER format
+        X509Certificate2 pkcs12Certificate = new X509Certificate2(Convert.FromBase64String(b64EncodedPkcs12Certificate));
+        string b64EncodedDerCertificate = Convert.ToBase64String(pkcs12Certificate.Export(X509ContentType.Cert));
 
         return b64EncodedDerCertificate;
     }
@@ -319,7 +331,7 @@ public class GatewayClient : IAzureAppGatewayClient
             CurrentInventoryItem inventoryItem = new CurrentInventoryItem()
             {
                 Alias = certObject.Name,
-                      PrivateKeyEntry = false,
+                      PrivateKeyEntry = true,
                       ItemStatus = OrchestratorInventoryItemStatus.Unknown,
                       UseChainLevel = true,
                       Certificates = b64EncodedDerCertificateList
@@ -364,6 +376,9 @@ public class GatewayClient : IAzureAppGatewayClient
 
         GetAppGatewayParentCollection().CreateOrUpdate(WaitUntil.Completed, appGatewayResource.Data.Name, appGatewayResource.Data);
 
+        // Invalidate the cache of currently bound certificates
+        currentlyBoundAppGatewayCertificateCache = null;
+
         _logger.LogDebug($"Successfully updated listener \"{listenerName}\" with certificate called \"{certificate.Name}\".");
     }
 
@@ -389,6 +404,12 @@ public class GatewayClient : IAzureAppGatewayClient
     // Returns a dictionary of listener names and their associated certificate names
     public IDictionary<string, string> GetBoundHttpsListenerCertificates()
     {
+        if (currentlyBoundAppGatewayCertificateCache != null)
+        {
+            _logger.LogDebug("Returning cached Application Gateway SSL Certificates bound to HTTPS listeners");
+            return currentlyBoundAppGatewayCertificateCache;
+        }
+
         _logger.LogDebug($"Getting Application Gateway SSL Certificates bound to HTTPS listeners");
 
         ApplicationGatewayResource appGatewayResource = _armClient.GetApplicationGatewayResource(AppGatewayResourceId).Get();
@@ -403,6 +424,8 @@ public class GatewayClient : IAzureAppGatewayClient
                 listenerCertificates.Add(listener.Name, certificate.Name);
             }
         }
+
+        currentlyBoundAppGatewayCertificateCache = listenerCertificates;
 
         return listenerCertificates;
     }

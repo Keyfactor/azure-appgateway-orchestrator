@@ -40,6 +40,7 @@ public class Management : IManagementJobExtension
                 OperationType.Replace => ReplaceCertificate(config),
                     OperationType.Add => AddCertificate(config),
                     OperationType.Remove => RemoveCertificate(config),
+                    OperationType.DoNothing => OrchestratorJobStatusJobResult.Success,
                     _ => throw new Exception($"Invalid Management operation type [{config.OperationType}]")
             };
         }
@@ -57,11 +58,25 @@ public class Management : IManagementJobExtension
         Add,
         Remove,
         Replace,
+        DoNothing,
         None
     }
 
     private OperationType DetermineOperation(ManagementJobConfiguration config)
     {
+        // If the operation is to add a gateway certificate and overwrite is true,
+        // before executing a replace operation, check if the certificate is bound to
+        // any listeners. If it is, DoNothing. If it isn't, Replace.
+        //
+        // This is because a Renew job was most likely executed on the AppGwBin certificate
+        // store type, which will handle the replacement job.
+
+        if (Client.CertificateIsBoundToHttpsListener(config.JobCertificate.Alias) && config.OperationType == CertStoreOperationType.Add && config.Overwrite)
+        {
+            _logger.LogDebug("Certificate is bound to an HTTPS listener; no action will be taken by AzureAppGW Management job.");
+            return OperationType.DoNothing;
+        }
+
         if (config.OperationType == CertStoreOperationType.Add && config.Overwrite)
             return OperationType.Replace;
 

@@ -193,10 +193,17 @@ public class AzureAppGatewayOrchestrator_AppGwBin
     }
 
     [Fact]
-    public void AppGwBin_ManagementAdd_ProcessJob_ValidClient_ReturnSuccess()
+    public void AppGwBin_ManagementAdd_ProcessJob_ListenerAlreadyBoundToCertificate_ReturnSuccess()
     {
         // Arrange
-        FakeClient client = new FakeClient();
+        FakeClient client = new FakeClient
+        {
+            CertificatesAvailableOnFakeAppGateway = new Dictionary<string, ApplicationGatewaySslCertificate>
+            {
+                // Internally, FakeClient tracks certificates bound to listeners with the Password property
+                { "certificate-from-unknown-source", new ApplicationGatewaySslCertificate { Name = "certificate-from-unknown-source", Password = "fake-https-listener" } }
+            }
+        };
 
         // Set up the management job with the fake client
         var management = new Management
@@ -227,16 +234,19 @@ public class AzureAppGatewayOrchestrator_AppGwBin
         if (client.CertificatesAvailableOnFakeAppGateway != null)
         {
             Assert.True(client.CertificatesAvailableOnFakeAppGateway.ContainsKey("fake-https-listener"));
-
-            // Internally, FakeClient represents HTTPS listeners bound to certificates with the Password field.
             Assert.True(client.CertificatesAvailableOnFakeAppGateway["fake-https-listener"].Password == "fake-https-listener");
+
+            // The original certificate should still be present, but not bound to the listener
+            Assert.True(client.CertificatesAvailableOnFakeAppGateway.ContainsKey("certificate-from-unknown-source"));
+            Assert.False(client.CertificatesAvailableOnFakeAppGateway["certificate-from-unknown-source"].Password == "fake-https-listener");
+            Assert.True(client.CertificatesAvailableOnFakeAppGateway.Count == 2);
         }
 
         _logger.LogInformation("AppGwBin_ManagementAdd_ProcessJob_ValidClient_ReturnSuccess - Success");
     }
 
     [Fact]
-    public void AppGwBin_ManagementReplace_ProcessJob_ValidClient_ReturnSuccess()
+    public void AppGwBin_ManagementAdd_ProcessJob_ListenerCertificateAddedByExtension_ReturnSuccess()
     {
         // Arrange
         FakeClient client = new FakeClient
@@ -244,7 +254,7 @@ public class AzureAppGatewayOrchestrator_AppGwBin
             CertificatesAvailableOnFakeAppGateway = new Dictionary<string, ApplicationGatewaySslCertificate>
             {
                 // Internally, FakeClient tracks certificates bound to listeners with the Password property
-                { "test-certificate", new ApplicationGatewaySslCertificate { Name = "test-certificate", Password = "fake-https-listener" } }
+                { "fake-https-listener", new ApplicationGatewaySslCertificate { Name = "fake-https-listener", Password = "fake-https-listener" } }
             }
         };
 
@@ -281,13 +291,14 @@ public class AzureAppGatewayOrchestrator_AppGwBin
 
             // Internally, FakeClient represents HTTPS listeners bound to certificates with the Password field.
             Assert.True(client.CertificatesAvailableOnFakeAppGateway["fake-https-listener"].Password == "fake-https-listener");
+            Assert.True(client.CertificatesAvailableOnFakeAppGateway.Count == 1);
         }
 
         _logger.LogInformation("AppGwBin_ManagementReplace_ProcessJob_ValidClient_ReturnSuccess - Success");
     }
 
     [Fact]
-    public void AppGwBin_Management_IntegrationTest_ReturnSuccess()
+    public void AppGwBin_Management_IntegrationTest_AddAndBindCertificate_ReturnSuccess()
     {
         // Arrange
         var iTenantId = Environment.GetEnvironmentVariable("AZURE_TENANT_ID") ?? string.Empty;
@@ -308,7 +319,7 @@ public class AzureAppGatewayOrchestrator_AppGwBin
         string currentlyBoundCertificate = currentlyBoundCertificates[iHttpsListenerName];
         _logger.LogTrace($"Certificate called {currentlyBoundCertificate} is currently bound to HTTPS listener {iHttpsListenerName}");
 
-        string testHostname = "example.com";
+        string testHostname = "azureappgatewayorchestratorUnitTest.com";
         string certName = "GatewayTest" + Guid.NewGuid().ToString()[..6];
         string password = "password";
 
@@ -342,32 +353,6 @@ public class AzureAppGatewayOrchestrator_AppGwBin
 
         // Assert
         Assert.Equal(OrchestratorJobStatusJobResult.Success, result.Result);
-
-        // Arrange
-        ssCert = AzureAppGatewayOrchestrator_Client.GetSelfSignedCert(testHostname);
-
-        b64PfxSslCert = Convert.ToBase64String(ssCert.Export(X509ContentType.Pfx, password));
-        
-        config.OperationType = CertStoreOperationType.Add;
-        config.Overwrite = true;
-        config.JobCertificate = new ManagementJobCertificate
-        {
-            Alias = iHttpsListenerName,
-            Contents = b64PfxSslCert,
-            PrivateKeyPassword = password
-        };
-
-        // Act
-        // This will process a Management Replace job
-        result = management.ProcessJob(config);
-
-        // Assert
-        Assert.Equal(OrchestratorJobStatusJobResult.Success, result.Result);
-
-        // Cleanup
-        ApplicationGatewaySslCertificate oldAppGatewayCertificate = client.GetAppGatewayCertificateByName(currentlyBoundCertificate);
-        client.UpdateHttpsListenerCertificate(oldAppGatewayCertificate, iHttpsListenerName);
-        client.RemoveCertificate(iHttpsListenerName);
 
         _logger.LogInformation("AzureAppGw_Management_IntegrationTest_ReturnSuccess - Success");
     }

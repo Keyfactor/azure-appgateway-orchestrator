@@ -17,6 +17,12 @@ jobs:
         with:
           dotnet-version: '6.x'
 
+      # Setup nuget
+      - name: Setup build environment
+        run: |
+          dotnet nuget add source https://nuget.pkg.github.com/Keyfactor/index.json -n github -u ${{ github.actor }} -p ${{ secrets.V2BUILDTOKEN }} --store-password-in-clear-text
+          dotnet restore
+
       # Build and test dotnet project
       - name: Build and Test
         run: dotnet test

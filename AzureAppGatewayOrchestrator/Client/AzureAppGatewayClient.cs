@@ -97,6 +97,22 @@ namespace Keyfactor.Extensions.Orchestrator.AzureAppGateway.Client
 
             foreach (ApplicationGatewaySslCertificate certObject in appGatewayResource.Data.SslCertificates)
             {
+                // Verify that certObject.PublicCertData is not null. If the certificate was imported into the app
+                // gateway from Azure Key Vault, certObject.PublicCertData will be null.
+                if (certObject.PublicCertData == null)
+                {
+                    if (!string.IsNullOrEmpty(certObject.KeyVaultSecretId))
+                    {
+                        _logger.LogDebug($"Certificate called \"{certObject.Name}\" ({certObject.Id}) was imported from Azure Key Vault with ID {certObject.KeyVaultSecretId} and cannot be retrieved.");
+                    }
+                    else
+                    {
+                        _logger.LogDebug($"Certificate called \"{certObject.Name}\" ({certObject.Id}) does not have any public certificate data.");
+                    }
+                    
+                    continue;
+                }
+                
                 // ApplicationGatewaySslCertificate is in PKCS#7 format
 
                 // Azure returns public cert data wrapped in parentheses. Remove them.
@@ -117,7 +133,7 @@ namespace Keyfactor.Extensions.Orchestrator.AzureAppGateway.Client
                 CurrentInventoryItem inventoryItem = new CurrentInventoryItem()
                 {
                     Alias = certObject.Name,
-                    PrivateKeyEntry = false,
+                    PrivateKeyEntry = true,
                     ItemStatus = OrchestratorInventoryItemStatus.Unknown,
                     UseChainLevel = true,
                     Certificates = list

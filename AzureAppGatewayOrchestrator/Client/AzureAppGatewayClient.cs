@@ -133,7 +133,7 @@ namespace Keyfactor.Extensions.Orchestrator.AzureAppGateway.Client
                 CurrentInventoryItem inventoryItem = new CurrentInventoryItem()
                 {
                     Alias = certObject.Name,
-                    PrivateKeyEntry = false,
+                    PrivateKeyEntry = true,
                     ItemStatus = OrchestratorInventoryItemStatus.Unknown,
                     UseChainLevel = true,
                     Certificates = list

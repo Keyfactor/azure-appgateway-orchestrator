@@ -110,11 +110,6 @@ test: ## Run a single test.
 
 ##@ Build
 
-.PHONY: regcheck
-regcheck: ## Check if the docker registry is set.
-	@test -n "$(DOCKER_REGISTRY)" || (echo "DOCKER_REGISTRY is not set" && exit 1)
-	@test -n "$(DOCKER_IMAGE_NAME)" || (echo "DOCKER_IMAGE_NAME is not set" && exit 1)
-
 .PHONY: build
 build: ## Build the test project
 	dotnet build 

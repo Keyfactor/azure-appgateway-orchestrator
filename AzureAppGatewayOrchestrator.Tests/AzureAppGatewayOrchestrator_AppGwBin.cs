@@ -22,23 +22,20 @@ public class AzureAppGatewayOrchestrator_AppGwBin
         _logger = LogHandler.GetClassLogger<AzureAppGatewayOrchestrator_AppGwBin>();
     }
 
-    [Fact]
+    [IntegrationTestingFact]
     public void AppGwBin_Inventory_IntegrationTest_ReturnSuccess()
     {
         // Arrange
-        var iTenantId = Environment.GetEnvironmentVariable("AZURE_TENANT_ID") ?? string.Empty;
-        var iApplicationId = Environment.GetEnvironmentVariable("AZURE_CLIENT_ID") ?? string.Empty;
-        var iClientSecret = Environment.GetEnvironmentVariable("AZURE_CLIENT_SECRET") ?? string.Empty;
-        var iResourceId = Environment.GetEnvironmentVariable("AZURE_APP_GATEWAY_RESOURCE_ID") ?? string.Empty;
+        IntegrationTestingFact env = new();
 
         // Set up the inventory job configuration
         var config = new InventoryJobConfiguration
         {
             CertificateStoreDetails = new CertificateStore
             {
-                ClientMachine = iTenantId,
-                              StorePath = iResourceId,
-                              Properties = $"{{\"ServerUsername\":\"{iApplicationId}\",\"ServerPassword\":\"{iClientSecret}\",\"AzureCloud\":\"\"}}"
+                ClientMachine = env.TenantId,
+                              StorePath = env.ResourceId,
+                              Properties = $"{{\"ServerUsername\":\"{env.ApplicationId}\",\"ServerPassword\":\"{env.ClientSecret}\",\"AzureCloud\":\"\"}}"
             }
         };
 
@@ -297,27 +294,23 @@ public class AzureAppGatewayOrchestrator_AppGwBin
         _logger.LogInformation("AppGwBin_ManagementReplace_ProcessJob_ValidClient_ReturnSuccess - Success");
     }
 
-    [Fact]
+    [IntegrationTestingFact]
     public void AppGwBin_Management_IntegrationTest_AddAndBindCertificate_ReturnSuccess()
     {
         // Arrange
-        var iTenantId = Environment.GetEnvironmentVariable("AZURE_TENANT_ID") ?? string.Empty;
-        var iApplicationId = Environment.GetEnvironmentVariable("AZURE_CLIENT_ID") ?? string.Empty;
-        var iClientSecret = Environment.GetEnvironmentVariable("AZURE_CLIENT_SECRET") ?? string.Empty;
-        var iResourceId = Environment.GetEnvironmentVariable("AZURE_APP_GATEWAY_RESOURCE_ID") ?? string.Empty;
-        var iHttpsListenerName = Environment.GetEnvironmentVariable("AZURE_APP_GATEWAY_HTTPS_LISTENER_NAME") ?? string.Empty;
+        IntegrationTestingFact env = new();
 
         // Items necessary for cleanup
         IAzureAppGatewayClient client = new GatewayClient.Builder()
-            .WithTenantId(iTenantId)
-            .WithApplicationId(iApplicationId)
-            .WithClientSecret(iClientSecret)
-            .WithResourceId(iResourceId)
+            .WithTenantId(env.TenantId)
+            .WithApplicationId(env.ApplicationId)
+            .WithClientSecret(env.ClientSecret)
+            .WithResourceId(env.ResourceId)
             .Build();
 
         IDictionary<string, string> currentlyBoundCertificates = client.GetBoundHttpsListenerCertificates();
-        string currentlyBoundCertificate = currentlyBoundCertificates[iHttpsListenerName];
-        _logger.LogTrace($"Certificate called {currentlyBoundCertificate} is currently bound to HTTPS listener {iHttpsListenerName}");
+        string currentlyBoundCertificate = currentlyBoundCertificates[env.HttpsListenerName];
+        _logger.LogTrace($"Certificate called {currentlyBoundCertificate} is currently bound to HTTPS listener {env.HttpsListenerName}");
 
         string testHostname = "azureappgatewayorchestratorUnitTest.com";
         string certName = "GatewayTest" + Guid.NewGuid().ToString()[..6];
@@ -333,13 +326,13 @@ public class AzureAppGatewayOrchestrator_AppGwBin
             OperationType = CertStoreOperationType.Add,
             CertificateStoreDetails = new CertificateStore
             {
-                ClientMachine = iTenantId,
-                              StorePath = iResourceId,
-                              Properties = $"{{\"ServerUsername\":\"{iApplicationId}\",\"ServerPassword\":\"{iClientSecret}\",\"AzureCloud\":\"\"}}"
+                ClientMachine = env.TenantId,
+                              StorePath = env.ResourceId,
+                              Properties = $"{{\"ServerUsername\":\"{env.ApplicationId}\",\"ServerPassword\":\"{env.ClientSecret}\",\"AzureCloud\":\"\"}}"
             },
             JobCertificate = new ManagementJobCertificate
             {
-                Alias = iHttpsListenerName,
+                Alias = env.HttpsListenerName,
                 Contents = b64PfxSslCert,
                 PrivateKeyPassword = password
             },

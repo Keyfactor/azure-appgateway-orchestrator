@@ -23,23 +23,20 @@ public class AzureAppGatewayOrchestrator_AzureAppGw
         _logger = LogHandler.GetClassLogger<AzureAppGatewayOrchestrator_AzureAppGw>();
     }
 
-    [Fact]
+    [IntegrationTestingFact]
     public void AzureAppGw_Inventory_IntegrationTest_ReturnSuccess()
     {
         // Arrange
-        var iTenantId = Environment.GetEnvironmentVariable("AZURE_TENANT_ID") ?? string.Empty;
-        var iApplicationId = Environment.GetEnvironmentVariable("AZURE_CLIENT_ID") ?? string.Empty;
-        var iClientSecret = Environment.GetEnvironmentVariable("AZURE_CLIENT_SECRET") ?? string.Empty;
-        var iResourceId = Environment.GetEnvironmentVariable("AZURE_APP_GATEWAY_RESOURCE_ID") ?? string.Empty;
+        IntegrationTestingFact env = new();
 
         // Set up the inventory job configuration
         var config = new InventoryJobConfiguration
         {
             CertificateStoreDetails = new CertificateStore
             {
-                ClientMachine = iTenantId,
-                              StorePath = iResourceId,
-                              Properties = $"{{\"ServerUsername\":\"{iApplicationId}\",\"ServerPassword\":\"{iClientSecret}\",\"AzureCloud\":\"\"}}"
+                ClientMachine = env.TenantId,
+                              StorePath = env.ResourceId,
+                              Properties = $"{{\"ServerUsername\":\"{env.ApplicationId}\",\"ServerPassword\":\"{env.ClientSecret}\",\"AzureCloud\":\"\"}}"
             }
         };
 
@@ -148,24 +145,21 @@ public class AzureAppGatewayOrchestrator_AzureAppGw
         _logger.LogInformation("AzureAppGw_Inventory_ProcessJob_InvalidClient_ReturnFailure - Success");
     }
 
-    [Fact]
+    [IntegrationTestingFact]
     public void AzureAppGw_Discovery_IntegrationTest_ReturnSuccess()
     {
         // Arrange
-        var iTenantId = Environment.GetEnvironmentVariable("AZURE_TENANT_ID") ?? string.Empty;
-        var iApplicationId = Environment.GetEnvironmentVariable("AZURE_CLIENT_ID") ?? string.Empty;
-        var iClientSecret = Environment.GetEnvironmentVariable("AZURE_CLIENT_SECRET") ?? string.Empty;
-        var iResourceId = Environment.GetEnvironmentVariable("AZURE_APP_GATEWAY_RESOURCE_ID") ?? string.Empty;
+        IntegrationTestingFact env = new();
 
         // Set up the discovery job configuration
         var config = new DiscoveryJobConfiguration
         {
-            ClientMachine = iTenantId,
-            ServerUsername = iApplicationId,
-            ServerPassword = iClientSecret,
+            ClientMachine = env.TenantId,
+            ServerUsername = env.ApplicationId,
+            ServerPassword = env.ClientSecret,
             JobProperties = new Dictionary<string, object>
             {
-                { "dirs", iTenantId }
+                { "dirs", env.TenantId }
             }
         };
 
@@ -528,14 +522,11 @@ public class AzureAppGatewayOrchestrator_AzureAppGw
         _logger.LogInformation("AzureAppGw_ManagementReplace_ProcessJob_ValidClient_ReturnSuccess - Success");
     }
 
-    [Fact]
+    [IntegrationTestingFact]
     public void AzureAppGw_Management_IntegrationTest_ReturnSuccess()
     {
         // Arrange
-        var iTenantId = Environment.GetEnvironmentVariable("AZURE_TENANT_ID") ?? string.Empty;
-        var iApplicationId = Environment.GetEnvironmentVariable("AZURE_CLIENT_ID") ?? string.Empty;
-        var iClientSecret = Environment.GetEnvironmentVariable("AZURE_CLIENT_SECRET") ?? string.Empty;
-        var iResourceId = Environment.GetEnvironmentVariable("AZURE_APP_GATEWAY_RESOURCE_ID") ?? string.Empty;
+        IntegrationTestingFact env = new();
 
         string testHostname = "azureappgatewayorchestratorUnitTest.com";
         string certName = "GatewayTest" + Guid.NewGuid().ToString()[..6];
@@ -551,9 +542,9 @@ public class AzureAppGatewayOrchestrator_AzureAppGw
             OperationType = CertStoreOperationType.Add,
             CertificateStoreDetails = new CertificateStore
             {
-                ClientMachine = iTenantId,
-                              StorePath = iResourceId,
-                              Properties = $"{{\"ServerUsername\":\"{iApplicationId}\",\"ServerPassword\":\"{iClientSecret}\",\"AzureCloud\":\"\"}}"
+                ClientMachine = env.TenantId,
+                              StorePath = env.ResourceId,
+                              Properties = $"{{\"ServerUsername\":\"{env.ApplicationId}\",\"ServerPassword\":\"{env.ClientSecret}\",\"AzureCloud\":\"\"}}"
             },
             JobCertificate = new ManagementJobCertificate
             {

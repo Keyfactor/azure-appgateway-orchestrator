@@ -15,13 +15,6 @@ using NLog.Extensions.Logging;
 
 namespace AzureAppGatewayOrchestrator.Tests;
 
-// Unit tests for the AzureAppGateway Client class.
-// Integration tests are the <> project.
-//
-// Since the Client class is a wrapper around the Azure Resource Management client
-// (ArmClient), we'll mock the ArmClass to isolate the Client class code since
-// this class uses the dependency injection pattern.
-
 public class AzureAppGatewayOrchestrator_Client
 {
     private ResourceIdentifier _appGatewayResourceId;
@@ -33,7 +26,7 @@ public class AzureAppGatewayOrchestrator_Client
         _appGatewayResourceId = new ResourceIdentifier("/subscriptions/12345678-1234-1234-1234-123456789012/resourceGroups/testResourceGroup/providers/Microsoft.Network/applicationGateways/testAppGateway");
     }
     
-    [Fact]
+    [IntegrationTestingFact]
     public void AzureClientIntegrationTest()
     {
         // Arrange

@@ -1,0 +1,23 @@
+name: Build and Test dotnet project
+on: [workflow_dispatch, push, pull_request]
+jobs:
+  build-and-test:
+    name: Build and Test dotnet project
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      # Checkout code
+      # https://github.com/actions/checkout
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # Setup dotnet 6.0
+      # https://github.com/actions/setup-dotnet
+      - uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: '6.x'
+
+      # Build and test dotnet project
+      - name: Build and Test
+        run: dotnet test
+

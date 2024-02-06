@@ -54,6 +54,8 @@ The Azure Application Gateway Orchestrator extension remotely manages certificat
 Application Gateways. The extension implements the Inventory, Management Add, Management Remove,
 and Discovery job types. 
 
+> The extension manages only App Gateway Certificates, _not_ Azure Key Vault certificates. The extension cannot inventory or manage certificates imported from Azure Key Vault. If you need to manage certificates in Azure Key Vault, use the [Azure Key Vault Orchestrator](https://github.com/Keyfactor/azurekeyvault-orchestrator).
+
 The Add and Remove operations create and remove _ApplicationGatewaySslCertificate_'s associated with
 the Application Gateway. The Add operation implements an optional enrollment field for an HTTP Listener name. If
 provided, the certificate will be associated with the listener. If a certificate is associated with a listener,
@@ -68,126 +70,108 @@ The Azure Application Gateway Orchestrator extension uses an Azure Service Princ
 [documentation](https://learn.microsoft.com/en-us/azure/purview/create-service-principal-azure) to create a service principal.
 For quick start, the service principal should be granted the Contributor role on the resource group that manages the Application Gateway.
 For production environments, the service principal should be granted the least privilege required to manage the Application Gateway.
+Specifically, the service principal should be granted a role that enables Read and Write for `Microsoft.Network``
 
-## Keyfactor Configuration
-Follow the Keyfactor Orchestrator configuration guide to install the Azure Application Gateway Orchestrator extension.
+## Creating Store Types for the Azure Application Gateway Orchestrator
+To get started with the Azure Application Gateway Orchestrator Extension, you'll need to create a store type in Keyfactor Command. The recommended and supported way to create store types is using the `kfutil` command line tool. Install [Kfutil](https://github.com/Keyfactor/kfutil) if it is not already installed. Once installed, use `kfutil login` to log into the target Command environment.
 
-This guide uses the `kfutil` Keyfactor command line tool that offers convenient and powerful
-command line access to the Keyfactor platform. Before proceeding, ensure that `kfutil` is installed and configured
-by following the instructions here: [https://github.com/Keyfactor/kfutil](https://github.com/Keyfactor/kfutil)
+Then, use the following command to create the store types:
 
-Configuration is done in two steps:
-1. Create a new Keyfactor Certificate Store Type
-2. Create a new Keyfactor Certificate Store
 
-### Keyfactor Certificate Store Type Configuration
-Keyfactor Certificate Store Types are used to define and configure the platforms that store and use certificates that will be managed
-by Keyfactor Orchestrators. To create the Azure Application Gateway Certificate Store Type, run the following command with `kfutil`:
-   ```bash
-   cat << EOF > ./AzureAppGW.json
-   {
-     "Name": "Azure Application Gateway",
-     "ShortName": "AzureAppGW",
-     "Capability": "AzureAppGW",
-     "LocalStore": false,
-     "SupportedOperations": {
-       "Add": true,
-       "Create": false,
-       "Discovery": true,
-       "Enrollment": false,
-       "Remove": true
-     },
-     "Properties": [
-       {
-         "Name": "ServerUsername",
-         "DisplayName": "Server Username",
-         "Type": "Secret",
-         "DependsOn": null,
-         "DefaultValue": null,
-         "Required": true
-       },
-       {
-         "Name": "ServerPassword",
-         "DisplayName": "Server Password",
-         "Type": "Secret",
-         "DependsOn": null,
-         "DefaultValue": null,
-         "Required": true
-       },
-       {
-         "Name": "AzureCloud",
-         "DisplayName": "Azure Cloud",
-         "Type": "MultipleChoice",
-         "DependsOn": "",
-         "DefaultValue": "public,china,germany,government",
-         "Required": false
-       },
-       {
-         "Name": "PrivateEndpoint",
-         "DisplayName": "Private KeyVault Endpoint",
-         "Type": "String",
-         "DependsOn": "",
-         "DefaultValue": null,
-         "Required": false
-       },
-       {
-         "Name": "ServerUseSsl",
-         "DisplayName": "Use SSL",
-         "Type": "Bool",
-         "DependsOn": null,
-         "DefaultValue": "true",
-         "Required": false
-       }
-     ],
-     "EntryParameters": [
-       {
-         "Name": "HTTPListenerName",
-         "DisplayName": "HTTP Listener Name",
-         "Type": "String",
-         "RequiredWhen": {
-           "HasPrivateKey": false,
-           "OnAdd": false,
-           "OnRemove": false,
-           "OnReenrollment": false
-         }
-       }
-     ],
-     "PasswordOptions": {
-       "EntrySupported": false,
-       "StoreRequired": false,
-       "Style": "Default"
-     },
-     "PrivateKeyAllowed": "Required",
-     "ServerRequired": true,
-     "PowerShell": false,
-     "BlueprintAllowed": false,
-     "CustomAliasAllowed": "Required",
-     "ServerRegistration": 13,
-     "InventoryEndpoint": "/AnyInventory/Update"
-   }
-   EOF
-   kfutil store-types create --from-file AzureAppGW.json
-   ```
+```shell
+kfutil store-types create AzureAppGW
+```
 
-### Keyfactor Store and Discovery Job Configuration
-To create a new certificate store in Keyfactor Command, select the _Locations_ drop down, select _Certificate Stores_, and click the _Add_ button.
-To schedule a discovery job, select the _Locations_ drop down, select _Certificate Stores_, click on the _Discovery_ button, and click the _Schedule_ button. For both operations,
-fill the form with the following values:
+It is not required to create all store types. Only create the store types that are needed for the integration.
 
-| Parameter       | Value                           | Description                                                                                                                                                                                                 |
-|-----------------|---------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| Category        | 'Azure Application Gateway'     | Name of the Appplication Gateway store type                                                                                                                                                                 |
-| Client Machine  | Azure Tenant ID                 | The Azure Tenant ID of the service principal                                                                                                                                                                |
-| Store Path      | Application Gateway resource ID | Azure resource ID of the application gateway in the form `/subscriptions/<subscription-id>/resourceGroups/<resource-group-name>/providers/Microsoft.Network/applicationGateways/<application-gateway-name>` |
-| Server Username | Application ID                  | Application ID of the service principal that will be used to manage the Application Gateway                                                                                                                 |
-| Server Password | Client Secret                   | Secret of the service principal that will be used to manage the Application Gateway                                                                                                                         |
-| Azure Cloud | Azure Global Cloud Authority Host | The Azure Cloud field, if necessary, should contain one of the following values: "china, germany, government".  This is the Azure Cloud instance your organization uses.  If using the standard "public" cloud, this field can be left blank or omitted entirely from the store type definition. |
-| Private Endpoint | Azure Private Endpoint URL prefix | The Private Endpoint field should be used if you have a custom url assigned to your keyvault resources and they are not accessible via the standard endpoint associated with the Azure Cloud instance (\*.vault.azure.net, \*.vault.azure.cn, etc.).  This field should contain the base url for your vault instance(s), excluding the vault name.  If using the standard endpoints corresponding to your Azure Cloud instance, this field can be left blank or omitted entirely from the store type definition.|
+If you prefer to create store types manually in the UI, navigate to your Command instance and follow the instructions below.
+<details><summary>AzureAppGW</summary>
 
-For the discovery job, populate the _Directories to search_ with any value. The extension will discover all Application Gateways accessible by the Azure Service Principal.
+Create a store type called `AzureAppGW` with the attributes in the tables below:
 
-> :warning: Discovery jobs are not supported for KeyVaults located outside of the Azure Public cloud or Keyvaults accessed via a private url endpoint.  
-> All other job types implemented by this integration are supported for alternate Azure clouds and private endpoints.
+### Basic Tab
+| Attribute | Value | Description |
+| --------- | ----- | ----- |
+| Name | Azure Application Gateway | Display name for the store type (may be customized) |
+| Short Name | AzureAppGW | Short display name for the store type |
+| Capability | AzureAppGW | Store type name orchestrator will register with. Check the box to allow entry of value |
+| Supported Job Types (check the box for each) | Add, Discovery, Remove | Job types the extension supports |
+| Needs Server | &check; | Determines if a target server name is required when creating store |
+| Blueprint Allowed |  | Determines if store type may be included in an Orchestrator blueprint |
+| Uses PowerShell |  | Determines if underlying implementation is PowerShell |
+| Requires Store Password |  | Determines if a store password is required when configuring an individual store. |
+| Supports Entry Password |  | Determines if an individual entry within a store can have a password. |
+
+
+The Basic tab should look like this:
+
+![AzureAppGW Basic Tab](.github/images/AzureAppGW-basic-store-type-dialog.png)
+
+### Advanced Tab
+| Attribute | Value | Description |
+| --------- | ----- | ----- |
+| Supports Custom Alias | Required | Determines if an individual entry within a store can have a custom Alias. |
+| Private Key Handling | Required | This determines if Keyfactor can send the private key associated with a certificate to the store. Required because IIS certificates without private keys would be invalid. |
+| PFX Password Style | Default | 'Default' - PFX password is randomly generated, 'Custom' - PFX password may be specified when the enrollment job is created (Requires the Allow Custom Password application setting to be enabled.) |
+
+
+The Advanced tab should look like this:
+
+![AzureAppGW Advanced Tab](.github/images/AzureAppGW-advanced-store-type-dialog.png)
+
+### Custom Fields Tab
+Custom fields operate at the certificate store level and are used to control how the orchestrator connects to the remote target server containing the certificate store to be managed. The following custom fields should be added to the store type:
+
+| Name | Display Name | Type | Default Value/Options | Required | Description |
+| ---- | ------------ | ---- | --------------------- | -------- | ----------- |
+| ServerUsername | Server Username | Secret | None | &check; | Application ID of the service principal that will be used to manage the Application Gateway. |
+| ServerPassword | Server Password | Secret | None | &check; | Secret of the service principal that will be used to manage the Application Gateway. |
+| ServerUseSsl | Use SSL | Bool | true |  | Indicates whether SSL should be used |
+| AzureCloud | Azure Cloud | MultipleChoice | public,china,germany,government |  | The Azure Cloud field, if necessary, should contain one of the following values: 'china, germany, government'. This field specifies the Azure Cloud instance used by the organization. If using the standard 'public' cloud, this field can be left blank or omitted from the store type definition. |
+
+
+The Custom Fields tab should look like this:
+
+![AzureAppGW Custom Fields Tab](.github/images/AzureAppGW-custom-fields-store-type-dialog.png)
+
+### Entry Parameters Tab
+Entry parameters are inventoried and maintained for each entry within a certificate store. They are typically used to support binding of a certificate to a resource. The following entry parameters should be added to the store type:
+
+
+
+| Name | Display Name | Type | Default Value | Entry has a private key | Adding an entry | Removing an entry | Reenrolling an entry | Description |
+| ---- | ------------ | ---- | ------------- | ----------------------- | ---------------- | ----------------- | ------------------- | ----------- |
+| HTTPListenerName | HTTP Listener Name | String | None |  |  |  |  | The name of the HTTP listener to which the certificate will be bound. |
+
+
+The Entry Parameters tab should look like this:
+
+![AzureAppGW Entry Parameters Tab](.github/images/./AzureAppGW-entry-parameters-store-type-dialog.png)
+
+</details>
+
+## Instantiating New Azure Application Gateway Orchestrator Stores
+Once the store types have been created, you can instantiate certificate stores for the store type. This section describes how to instantiate a certificate store for each store type. Creating new certificate stores is how certificates in the remote platform are inventoried and managed by the orchestrator.
+<details><summary>AzureAppGW</summary>
+
+In Keyfactor Command, navigate to Certificate Stores from the Locations Menu. Click the Add button to create a new Certificate Store using the settings defined below.
+
+| Attribute | Description |
+| --------- | ----------- |
+| Category | Select Azure Application Gateway  or the customized certificate store name from the previous step. |
+| Container | Optional container to associate certificate store with. |
+| Client Machine | The Azure Tenant ID of the service principal. |
+| Store Path | Azure resource ID of the application gateway in the form `/subscriptions/<subscription-id>/resourceGroups/<resource-group-name>/providers/Microsoft.Network/applicationGateways/<application-gateway-name>` |
+| Orchestrator | Select an approved orchestrator capable of managing AzureAppGW certificates. Specifically, one with the AzureAppGW capability. |
+| Server Username | Application ID of the service principal that will be used to manage the Application Gateway. |
+| Server Password | Secret of the service principal that will be used to manage the Application Gateway. |
+| Use SSL | Indicates whether SSL should be used |
+| Azure Cloud | The Azure Cloud field, if necessary, should contain one of the following values: 'china, germany, government'. This field specifies the Azure Cloud instance used by the organization. If using the standard 'public' cloud, this field can be left blank or omitted from the store type definition. |
+| HTTP Listener Name | The name of the HTTP listener to which the certificate will be bound. |
+
+
+</details>
+
 
 ### Important note about Certificate Renewal
 The Azure Application Gateway Orchestrator extension supports certificate renewal. If a certificate is renewed and is associated with an HTTP Listener,

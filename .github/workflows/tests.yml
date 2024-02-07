@@ -1,0 +1,29 @@
+name: Build and Test dotnet project
+on: [workflow_dispatch, push, pull_request]
+jobs:
+  build-and-test:
+    name: Build and Test dotnet project
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      # Checkout code
+      # https://github.com/actions/checkout
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # Setup dotnet 6.0
+      # https://github.com/actions/setup-dotnet
+      - uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: '6.x'
+
+      # Setup nuget
+      - name: Setup build environment
+        run: |
+          dotnet nuget add source https://nuget.pkg.github.com/Keyfactor/index.json -n github -u ${{ github.actor }} -p ${{ secrets.V2BUILDTOKEN }} --store-password-in-clear-text
+          dotnet restore
+
+      # Build and test dotnet project
+      - name: Build and Test
+        run: dotnet test
+

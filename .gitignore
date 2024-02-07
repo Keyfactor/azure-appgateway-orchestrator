@@ -346,3 +346,6 @@ healthchecksdb
 /key.pem
 /cert.pem
 /cert.csr
+
+.DS_Store
+*.env

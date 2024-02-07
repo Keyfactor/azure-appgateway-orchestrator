@@ -25,7 +25,7 @@ namespace AzureApplicationGatewayOrchestratorExtension.ListenerBindingJobs;
 
 public class Inventory : IInventoryJobExtension
 {
-    public string ExtensionName => "AppGwBin";
+    public string ExtensionName => "AzureAppGwBin";
     public IAzureAppGatewayClient Client { get; set; }
 
     ILogger _logger = LogHandler.GetClassLogger<Inventory>();

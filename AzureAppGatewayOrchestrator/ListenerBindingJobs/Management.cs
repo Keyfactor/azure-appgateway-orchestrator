@@ -25,7 +25,7 @@ namespace AzureApplicationGatewayOrchestratorExtension.ListenerBindingJobs;
 public class Management : IManagementJobExtension
 {
     public IAzureAppGatewayClient Client { get; set; }
-    public string ExtensionName => "AppGwBin";
+    public string ExtensionName => "AzureAppGwBin";
 
     ILogger _logger = LogHandler.GetClassLogger<Management>();
 

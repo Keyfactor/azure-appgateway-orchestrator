@@ -1,17 +1,29 @@
 {
   "extensions": {
     "Keyfactor.Orchestrators.Extensions.IOrchestratorJobExtension": {
-      "CertStores.AzureAppGW.Inventory": {
-        "assemblypath": "Keyfactor.Extensions.Orchestrators.AzureAppGW.dll",
-        "TypeFullName": "Keyfactor.Extensions.Orchestrator.AzureAppGateway.Jobs.Inventory"
+      "CertStores.AzureAppGw.Inventory": {
+        "assemblypath": "AzureApplicationGatewayOrchestratorExtension.dll",
+        "TypeFullName": "AzureApplicationGatewayOrchestratorExtension.AppGatewayCertificateJobs.Inventory"
       },
-      "CertStores.AzureAppGW.Management": {
-        "assemblypath": "Keyfactor.Extensions.Orchestrators.AzureAppGW.dll",
-        "TypeFullName": "Keyfactor.Extensions.Orchestrator.AzureAppGateway.Jobs.Management"
+      "CertStores.AzureAppGw.Management": {
+        "assemblypath": "AzureApplicationGatewayOrchestratorExtension.dll",
+        "TypeFullName": "AzureApplicationGatewayOrchestratorExtension.AppGatewayCertificateJobs.Management"
       },
-      "CertStores.AzureAppGW.Discovery": {
-        "assemblypath": "Keyfactor.Extensions.Orchestrators.AzureAppGW.dll",
-        "TypeFullName": "Keyfactor.Extensions.Orchestrator.AzureAppGateway.Jobs.Discovery"
+      "CertStores.AzureAppGw.Discovery": {
+        "assemblypath": "AzureApplicationGatewayOrchestratorExtension.dll",
+        "TypeFullName": "AzureApplicationGatewayOrchestratorExtension.AppGatewayCertificateJobs.Discovery"
+      },
+      "CertStores.AzureAppGwBin.Inventory": {
+        "assemblypath": "AzureApplicationGatewayOrchestratorExtension.dll",
+        "TypeFullName": "AzureApplicationGatewayOrchestratorExtension.ListenerBindingJobs.Inventory"
+      },
+      "CertStores.AzureAppGwBin.Management": {
+        "assemblypath": "AzureApplicationGatewayOrchestratorExtension.dll",
+        "TypeFullName": "AzureApplicationGatewayOrchestratorExtension.ListenerBindingJobs.Management"
+      },
+      "CertStores.AzureAppGwBin.Discovery": {
+        "assemblypath": "AzureApplicationGatewayOrchestratorExtension.dll",
+        "TypeFullName": "AzureApplicationGatewayOrchestratorExtension.ListenerBindingJobs.Discovery"
       }
     }
   }

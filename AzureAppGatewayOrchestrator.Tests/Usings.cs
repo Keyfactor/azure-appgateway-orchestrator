@@ -1,4 +1,4 @@
-﻿// Copyright 2023 Keyfactor
+// Copyright 2024 Keyfactor
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,20 +12,4 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
-
-namespace Keyfactor.Extensions.Orchestrator.AzureAppGateway.Jobs
-{
-    [AttributeUsage(AttributeTargets.Class, Inherited = false)]
-    public class JobAttribute : Attribute
-    {
-        private string JobClassName { get; }
-
-        public JobAttribute(string jobClass)
-        {
-            JobClassName = jobClass;
-        }
-        
-        public virtual string JobClass => JobClassName;
-    }
-}
+global using Xunit;

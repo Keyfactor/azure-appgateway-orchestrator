@@ -1,109 +1,159 @@
 {
-  "$schema": "https://keyfactor.github.io/integration-manifest-schema.json",
-  "integration_type": "orchestrator",
-  "name": "Azure Application Gateway Orchestrator",
-  "status": "production",
-  "update_catalog": true,
-  "link_github": true,
-  "support_level": "kf-community",
-  "release_dir": "AzureAppGatewayOrchestrator\\bin\\Release",
-  "description": "The Azure Application Gateway Orchestrator extension acts as a proxy between Keyfactor and Azure that allows Keyfactor to manage Application Gateway certificates.",
-  "about": {
-    "orchestrator": {
-      "win": {
-        "platformSupport": "Unused",
-        "supportsCreateStore": false,
-        "supportsDiscovery": true,
-        "supportsInventory": true,
-        "supportsManagementAdd": true,
-        "supportsManagementRemove": true,
-        "supportsReenrollment": false
-      },
-      "linux": {
-        "supportsCreateStore": false,
-        "supportsDiscovery": true,
-        "supportsManagementAdd": true,
-        "supportsManagementRemove": true,
-        "supportsReenrollment": false,
-        "supportsInventory": true,
-        "platformSupport": "Unused"
-      },
-      "UOFramework": "10.1",
-      "keyfactor_platform_version": "9.10",
-      "store_types": [
-        {
-          "Name": "Azure Application Gateway",
-          "ShortName": "AzureAppGW",
-          "Capability": "AzureAppGW",
-          "LocalStore": false,
-          "SupportedOperations": {
-            "Add": true,
-            "Create": false,
-            "Discovery": true,
-            "Enrollment": false,
-            "Remove": true
-          },
-          "Properties": [
-            {
-              "Name": "ServerUsername",
-              "DisplayName": "Server Username",
-              "Type": "Secret",
-              "DependsOn": null,
-              "DefaultValue": null,
-              "Required": true
+    "$schema": "https://keyfactor.github.io/integration-manifest-schema.json",
+    "name": "Azure Application Gateway Orchestrator",
+    "integration_type": "orchestrator",
+    "status": "production",
+    "description": "The Azure Application Gateway Orchestrator Extension is an extension to the Keyfactor Universal Orchestrator that allows for the management of certificates on Azure Application Gateways, including the ability to add and bind certificates to HTTPS listeners.",
+    "support_level": "kf-community",
+    "release_dir": "AzureAppGatewayOrchestrator\\bin\\Release",
+    "link_github": true,
+    "update_catalog": true,
+    "about": {
+        "orchestrator": {
+            "UOFramework": "10.4",
+            "pam_support": false,
+            "win": {
+                "supportsManagementAdd": true,
+                "supportsManagementRemove": true,
+                "supportsCreateStore": false,
+                "supportsDiscovery": true,
+                "supportsReenrollment": false,
+                "supportsInventory": true
             },
-            {
-              "Name": "ServerPassword",
-              "DisplayName": "Server Password",
-              "Type": "Secret",
-              "DependsOn": null,
-              "DefaultValue": null,
-              "Required": true
+            "linux": {
+                "supportsManagementAdd": true,
+                "supportsManagementRemove": true,
+                "supportsCreateStore": false,
+                "supportsDiscovery": true,
+                "supportsReenrollment": false,
+                "supportsInventory": true
             },
-            {
-              "Name": "ServerUseSsl",
-              "DisplayName": "Use SSL",
-              "Type": "Bool",
-              "DependsOn": null,
-              "DefaultValue": "true",
-              "Required": false
-            },
-            {
-              "Name": "AzureCloud",
-              "DisplayName": "Azure Cloud",
-              "Type": "MultipleChoice",
-              "DependsOn": "",
-              "DefaultValue": "public,china,germany,government",
-              "Required": false
+            "store_types": [
+                {
+                    "Name": "Azure Application Gateway Certificate",
+                    "ShortName": "AzureAppGw",
+                    "Capability": "AzureAppGw",
+                    "LocalStore": false,
+                    "SupportedOperations": {
+                        "Add": true,
+                        "Remove": true,
+                        "Enrollment": false,
+                        "Discovery": true,
+                        "Inventory": true
+                    },
+                    "Properties": [
+                        {
+                            "Name": "ServerUsername",
+                            "DisplayName": "Server Username",
+                            "Type": "Secret",
+                            "Required": true
+                        },
+                        {
+                            "Name": "ServerPassword",
+                            "DisplayName": "Server Password",
+                            "Type": "Secret",
+                            "Required": true
+                        },
+                        {
+                            "Name": "ServerUseSsl",
+                            "DisplayName": "Use SSL",
+                            "Type": "Bool",
+                            "DefaultValue": "true",
+                            "Required": false
+                        },
+                        {
+                            "Name": "AzureCloud",
+                            "DisplayName": "Azure Global Cloud Authority Host",
+                            "Type": "MultipleChoice",
+                            "DefaultValue": "public,china,germany,government",
+                            "Required": false
+                        }
+                    ],
+                    "PasswordOptions": {
+                        "EntrySupported": false,
+                        "StoreRequired": false,
+                        "Style": "Default"
+                    },
+                    "PrivateKeyAllowed": "Required",
+                    "ServerRequired": true,
+                    "PowerShell": false,
+                    "BlueprintAllowed": false,
+                    "CustomAliasAllowed": "Required"
+                },
+                {
+                    "Name": "Azure Application Gateway Certificate Binding",
+                    "ShortName": "AppGwBin",
+                    "Capability": "AzureAppGwBin",
+                    "LocalStore": false,
+                    "SupportedOperations": {
+                        "Add": true,
+                        "Remove": false,
+                        "Enrollment": false,
+                        "Discovery": true,
+                        "Inventory": false
+                    },
+                    "Properties": [
+                        {
+                            "Name": "ServerUsername",
+                            "DisplayName": "Server Username",
+                            "Type": "Secret",
+                            "Required": false
+                        },
+                        {
+                            "Name": "ServerPassword",
+                            "DisplayName": "Server Password",
+                            "Type": "Secret",
+                            "Required": false
+                        },
+                        {
+                            "Name": "ServerUseSsl",
+                            "DisplayName": "Use SSL",
+                            "Type": "Bool",
+                            "DefaultValue": "true",
+                            "Required": true
+                        },
+                        {
+                            "Name": "AzureCloud",
+                            "DisplayName": "Azure Global Cloud Authority Host",
+                            "Type": "MultipleChoice",
+                            "DefaultValue": "public,china,germany,government",
+                            "Required": false
+                        }
+                    ],
+                    "PasswordOptions": {
+                        "EntrySupported": false,
+                        "StoreRequired": false,
+                        "Style": "Default"
+                    },
+                    "PrivateKeyAllowed": "Required",
+                    "ServerRequired": true,
+                    "PowerShell": false,
+                    "BlueprintAllowed": false,
+                    "CustomAliasAllowed": "Required"
+                }
+            ],
+            "store_types_metadata": {
+                "AzureAppGw": {
+                    "ClientMachine": "The Azure Tenant ID of the service principal, representing the Tenant ID where the Application/Service Principal is managed.",
+                    "StorePath": "Azure resource ID of the application gateway, following the format: `/subscriptions/<subscription-id>/resourceGroups/<resource-group-name>/providers/Microsoft.Network/applicationGateways/<application-gateway-name>`.",
+                    "Properties": {
+                        "ServerUsername": "Application ID of the service principal, representing the identity used for managing the Application Gateway.",
+                        "ServerPassword": "Secret of the service principal that will be used to manage the Application Gateway.",
+                        "ServerUseSsl": "Indicates whether SSL usage is enabled for the connection.",
+                        "AzureCloud": "Specifies the Azure Cloud instance used by the organization."
+                    }
+                },
+                "AppGwBin": {
+                    "ClientMachine": "The Azure Tenant ID of the service principal, representing the Tenant ID where the Application/Service Principal is managed.",
+                    "StorePath": "Azure resource ID of the application gateway, following the format: `/subscriptions/<subscription-id>/resourceGroups/<resource-group-name>/providers/Microsoft.Network/applicationGateways/<application-gateway-name>`.",
+                    "Properties": {
+                        "ServerUsername": "Application ID of the service principal, representing the identity used for managing the Application Gateway.",
+                        "ServerPassword": "Secret of the service principal that will be used to manage the Application Gateway.",
+                        "ServerUseSsl": "Indicates whether SSL usage is enabled for the connection.",
+                        "AzureCloud": "Specifies the Azure Cloud instance used by the organization."
+                    }
+                }
             }
-          ],
-          "EntryParameters": [
-            {
-              "Name": "HTTPListenerName",
-              "DisplayName": "HTTP Listener Name",
-              "Type": "String",
-              "RequiredWhen": {
-                "HasPrivateKey": false,
-                "OnAdd": false,
-                "OnRemove": false,
-                "OnReenrollment": false
-              }
-            }
-          ],
-          "PasswordOptions": {
-            "EntrySupported": false,
-            "StoreRequired": false,
-            "Style": "Default"
-          },
-          "PrivateKeyAllowed": "Required",
-          "ServerRequired": true,
-          "PowerShell": false,
-          "BlueprintAllowed": false,
-          "CustomAliasAllowed": "Required",
-          "ServerRegistration": 13,
-          "InventoryEndpoint": "/AnyInventory/Update"
         }
-      ]
     }
-  }
 }

@@ -10,8 +10,9 @@
   - chore(docs): Refactor docs to describe limitation of Azure Key Vault certificate import to Azure App Gateway.
 
 - 2.0.0
-  - feat(bindings): Implemented a second Command Certificate Store Type called AppGwBin that logically represents the binding of an Application Gateway SSL Certificate to a TLS Listener.
+  - feat(bindings): Implemented a second Command Certificate Store Type called AzureAppGwBin that logically represents the binding of an Application Gateway SSL Certificate to a TLS Listener.
   - feat(bindings): Removed TLS Listener binding logic from AzureAppGW certificate store type implementation.
+  - chore(semantics): Renamed AzureAppGW to AzureAppGw for consistiency.
   - chore(client): Refactored client to prefer dependency injection pattern.
   - chore(jobs): Refactored Orchestrator job implementations to prefer dependency injection pattern.
   - chore(tests): Implemented unit testing framework with a fake client interface.

@@ -24,7 +24,7 @@ namespace AzureApplicationGatewayOrchestratorExtension.AppGatewayCertificateJobs
 public class Management : IManagementJobExtension
 {
     public IAzureAppGatewayClient Client { get; set; }
-    public string ExtensionName => "AzureAppGW";
+    public string ExtensionName => "AzureAppGw";
 
     ILogger _logger = LogHandler.GetClassLogger<Management>();
 
@@ -86,7 +86,7 @@ public class Management : IManagementJobExtension
 
         if (Client.CertificateIsBoundToHttpsListener(config.JobCertificate.Alias) && config.OperationType == CertStoreOperationType.Add && config.Overwrite)
         {
-            _logger.LogDebug("Certificate is bound to an HTTPS listener; no action will be taken by AzureAppGW Management job.");
+            _logger.LogDebug("Certificate is bound to an HTTPS listener; no action will be taken by AzureAppGw Management job.");
             return OperationType.DoNothing;
         }
 

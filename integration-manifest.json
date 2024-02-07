@@ -31,8 +31,8 @@
             "store_types": [
                 {
                     "Name": "Azure Application Gateway Certificate",
-                    "ShortName": "AzureAppGW",
-                    "Capability": "AzureAppGW",
+                    "ShortName": "AzureAppGw",
+                    "Capability": "AzureAppGw",
                     "LocalStore": false,
                     "SupportedOperations": {
                         "Add": true,
@@ -69,7 +69,6 @@
                             "Required": false
                         }
                     ],
-                    "EntryParameters": [],
                     "PasswordOptions": {
                         "EntrySupported": false,
                         "StoreRequired": false,
@@ -84,14 +83,14 @@
                 {
                     "Name": "Azure Application Gateway Certificate Binding",
                     "ShortName": "AppGwBin",
-                    "Capability": "AppGwBin",
+                    "Capability": "AzureAppGwBin",
                     "LocalStore": false,
                     "SupportedOperations": {
                         "Add": true,
                         "Remove": false,
                         "Enrollment": false,
                         "Discovery": true,
-                        "Inventory": true
+                        "Inventory": false
                     },
                     "Properties": [
                         {
@@ -121,7 +120,6 @@
                             "Required": false
                         }
                     ],
-                    "EntryParameters": [],
                     "PasswordOptions": {
                         "EntrySupported": false,
                         "StoreRequired": false,
@@ -135,7 +133,7 @@
                 }
             ],
             "store_types_metadata": {
-                "AzureAppGW": {
+                "AzureAppGw": {
                     "ClientMachine": "The Azure Tenant ID of the service principal, representing the Tenant ID where the Application/Service Principal is managed.",
                     "StorePath": "Azure resource ID of the application gateway, following the format: `/subscriptions/<subscription-id>/resourceGroups/<resource-group-name>/providers/Microsoft.Network/applicationGateways/<application-gateway-name>`.",
                     "Properties": {

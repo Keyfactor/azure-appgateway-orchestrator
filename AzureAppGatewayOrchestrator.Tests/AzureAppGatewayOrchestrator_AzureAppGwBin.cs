@@ -24,19 +24,19 @@ using NLog.Extensions.Logging;
 
 namespace AzureAppGatewayOrchestrator.Tests;
 
-public class AzureAppGatewayOrchestrator_AppGwBin
+public class AzureAppGatewayOrchestrator_AzureAppGwBin
 {
     ILogger _logger { get; set;}
 
-    public AzureAppGatewayOrchestrator_AppGwBin()
+    public AzureAppGatewayOrchestrator_AzureAppGwBin()
     {
         ConfigureLogging();
 
-        _logger = LogHandler.GetClassLogger<AzureAppGatewayOrchestrator_AppGwBin>();
+        _logger = LogHandler.GetClassLogger<AzureAppGatewayOrchestrator_AzureAppGwBin>();
     }
 
     [IntegrationTestingFact]
-    public void AppGwBin_Inventory_IntegrationTest_ReturnSuccess()
+    public void AzureAppGwBin_Inventory_IntegrationTest_ReturnSuccess()
     {
         // Arrange
         IntegrationTestingFact env = new();
@@ -61,7 +61,7 @@ public class AzureAppGatewayOrchestrator_AppGwBin
             Assert.NotNull(inventoryItems);
             Assert.NotEmpty(inventoryItems);
 
-            _logger.LogInformation("AppGwBin_Inventory_IntegrationTest_ReturnSuccess - Success");
+            _logger.LogInformation("AzureAppGwBin_Inventory_IntegrationTest_ReturnSuccess - Success");
             return true;
         });
 
@@ -70,7 +70,7 @@ public class AzureAppGatewayOrchestrator_AppGwBin
     }
 
     [Fact]
-    public void AppGwBin_Inventory_ProcessJob_ValidClientOneBoundHttpsListener_ReturnSuccess()
+    public void AzureAppGwBin_Inventory_ProcessJob_ValidClientOneBoundHttpsListener_ReturnSuccess()
     {
         // Arrange
         IAzureAppGatewayClient client = new FakeClient
@@ -107,7 +107,7 @@ public class AzureAppGatewayOrchestrator_AppGwBin
                 Assert.Equal(1, inventoryItems.Count());
                 Assert.Equal("fake-http-listener", inventoryItems.First().Alias);
 
-                _logger.LogInformation("AppGwBin_Inventory_ProcessJob_ValidClientOneBoundHttpsListener_ReturnSuccess - Success");
+                _logger.LogInformation("AzureAppGwBin_Inventory_ProcessJob_ValidClientOneBoundHttpsListener_ReturnSuccess - Success");
                 return true;
                 });
 
@@ -116,7 +116,7 @@ public class AzureAppGatewayOrchestrator_AppGwBin
     }
 
     [Fact]
-    public void AppGwBin_Discovery_ProcessJob_ValidClient_ReturnSuccess()
+    public void AzureAppGwBin_Discovery_ProcessJob_ValidClient_ReturnSuccess()
     {
         // Arrange
         IAzureAppGatewayClient client = new FakeClient
@@ -160,7 +160,7 @@ public class AzureAppGatewayOrchestrator_AppGwBin
     }
 
     [Fact]
-    public void AppGwBin_Discovery_ProcessJob_InvalidClient_ReturnFailure()
+    public void AzureAppGwBin_Discovery_ProcessJob_InvalidClient_ReturnFailure()
     {
         // Arrange
         IAzureAppGatewayClient client = new FakeClient();
@@ -203,7 +203,7 @@ public class AzureAppGatewayOrchestrator_AppGwBin
     }
 
     [Fact]
-    public void AppGwBin_ManagementAdd_ProcessJob_ListenerAlreadyBoundToCertificate_ReturnSuccess()
+    public void AzureAppGwBin_ManagementAdd_ProcessJob_ListenerAlreadyBoundToCertificate_ReturnSuccess()
     {
         // Arrange
         FakeClient client = new FakeClient
@@ -252,11 +252,11 @@ public class AzureAppGatewayOrchestrator_AppGwBin
             Assert.True(client.CertificatesAvailableOnFakeAppGateway.Count == 2);
         }
 
-        _logger.LogInformation("AppGwBin_ManagementAdd_ProcessJob_ValidClient_ReturnSuccess - Success");
+        _logger.LogInformation("AzureAppGwBin_ManagementAdd_ProcessJob_ValidClient_ReturnSuccess - Success");
     }
 
     [Fact]
-    public void AppGwBin_ManagementAdd_ProcessJob_ListenerCertificateAddedByExtension_ReturnSuccess()
+    public void AzureAppGwBin_ManagementAdd_ProcessJob_ListenerCertificateAddedByExtension_ReturnSuccess()
     {
         // Arrange
         FakeClient client = new FakeClient
@@ -304,11 +304,11 @@ public class AzureAppGatewayOrchestrator_AppGwBin
             Assert.True(client.CertificatesAvailableOnFakeAppGateway.Count == 1);
         }
 
-        _logger.LogInformation("AppGwBin_ManagementReplace_ProcessJob_ValidClient_ReturnSuccess - Success");
+        _logger.LogInformation("AzureAppGwBin_ManagementReplace_ProcessJob_ValidClient_ReturnSuccess - Success");
     }
 
     [IntegrationTestingFact]
-    public void AppGwBin_Management_IntegrationTest_AddAndBindCertificate_ReturnSuccess()
+    public void AzureAppGwBin_Management_IntegrationTest_AddAndBindCertificate_ReturnSuccess()
     {
         // Arrange
         IntegrationTestingFact env = new();

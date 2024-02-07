@@ -25,7 +25,7 @@ namespace AzureApplicationGatewayOrchestratorExtension.AppGatewayCertificateJobs
 public class Discovery : IDiscoveryJobExtension
 {
     public IAzureAppGatewayClient Client { get; set; }
-    public string ExtensionName => "AzureAppGW";
+    public string ExtensionName => "AzureAppGw";
 
     private bool _clientInitializedByInjection = false;
 

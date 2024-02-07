@@ -26,7 +26,7 @@ namespace AzureApplicationGatewayOrchestratorExtension.AppGatewayCertificateJobs
 public class Inventory : IInventoryJobExtension
 {
     public IAzureAppGatewayClient Client { get; set; }
-    public string ExtensionName => "AzureAppGW";
+    public string ExtensionName => "AzureAppGw";
 
     ILogger _logger = LogHandler.GetClassLogger<Inventory>();
 

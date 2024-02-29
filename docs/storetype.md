@@ -31,7 +31,7 @@ The Discovery operation uses the "Directories to search" field, and accepts inpu
 - `<tenant-id>,<tenant-id>,...` - If a comma-separated list of tenant IDs is used, the extension will search for Application Gateways in every resource group and tenant specified in the list. The tenant IDs should be the GUIDs associated with each tenant, and it's the user's responsibility to ensure that the service principal has access to the specified tenants.
 
 ### Manually Adding Certificate Stores
-The recommended and supported way to create Certificate Store Types in Command is to use [kfutil](https://github.com/Keyfactor/kfutil). However, if you prefer to create store types manually in the UI, navigate to your Command instance and follow the instructions below.
+The recommended and supported way to create Certificate Store Types in Command is to use [kfutil](https:/../.github.com/Keyfactor/kfutil). However, if you prefer to create store types manually in the UI, navigate to your Command instance and follow the instructions below.
 <details><summary>AzureAppGw</summary>
 
 Create a store type called `AzureAppGw` with the attributes in the tables below:
@@ -52,7 +52,7 @@ Create a store type called `AzureAppGw` with the attributes in the tables below:
 
 The Basic tab should look like this:
 
-![AzureAppGw Basic Tab](.github/images/AzureAppGw-basic-store-type-dialog.png)
+![AzureAppGw Basic Tab](../.github/images/AzureAppGw-basic-store-type-dialog.png)
 
 ### Advanced Tab
 | Attribute | Value | Description |
@@ -64,7 +64,7 @@ The Basic tab should look like this:
 
 The Advanced tab should look like this:
 
-![AzureAppGw Advanced Tab](.github/images/AzureAppGw-advanced-store-type-dialog.png)
+![AzureAppGw Advanced Tab](../.github/images/AzureAppGw-advanced-store-type-dialog.png)
 
 ### Custom Fields Tab
 Custom fields operate at the certificate store level and are used to control how the orchestrator connects to the remote target server containing the certificate store to be managed. The following custom fields should be added to the store type:
@@ -79,7 +79,7 @@ Custom fields operate at the certificate store level and are used to control how
 
 The Custom Fields tab should look like this:
 
-![AzureAppGw Custom Fields Tab](.github/images/AzureAppGw-custom-fields-store-type-dialog.png)
+![AzureAppGw Custom Fields Tab](../.github/images/AzureAppGw-custom-fields-store-type-dialog.png)
 
 </details>
 
@@ -103,7 +103,7 @@ Create a store type called `AppGwBin` with the attributes in the tables below:
 
 The Basic tab should look like this:
 
-![AppGwBin Basic Tab](.github/images/AppGwBin-basic-store-type-dialog.png)
+![AppGwBin Basic Tab](../.github/images/AppGwBin-basic-store-type-dialog.png)
 
 ### Advanced Tab
 | Attribute | Value | Description |
@@ -115,7 +115,7 @@ The Basic tab should look like this:
 
 The Advanced tab should look like this:
 
-![AppGwBin Advanced Tab](.github/images/AppGwBin-advanced-store-type-dialog.png)
+![AppGwBin Advanced Tab](../.github/images/AppGwBin-advanced-store-type-dialog.png)
 
 ### Custom Fields Tab
 Custom fields operate at the certificate store level and are used to control how the orchestrator connects to the remote target server containing the certificate store to be managed. The following custom fields should be added to the store type:
@@ -130,6 +130,6 @@ Custom fields operate at the certificate store level and are used to control how
 
 The Custom Fields tab should look like this:
 
-![AppGwBin Custom Fields Tab](.github/images/AppGwBin-custom-fields-store-type-dialog.png)
+![AppGwBin Custom Fields Tab](../.github/images/AppGwBin-custom-fields-store-type-dialog.png)
 
 </details>

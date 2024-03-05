@@ -316,8 +316,9 @@ public class GatewayClient : IAzureAppGatewayClient
                 }
                 catch (Exception e)
                 {
-                    _logger.LogError($"Error retrieving certificate from Azure Key Vault with ID {certObject.KeyVaultSecretId}: {e.Message}");
-                    continue;
+                    string error = $"Error retrieving certificate from Azure Key Vault with ID {certObject.KeyVaultSecretId}: {e.Message}";
+                    _logger.LogError(error);
+                    throw new Exception(error);
                 }
             }
             else 

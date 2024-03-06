@@ -273,14 +273,15 @@ public class GatewayClient : IAzureAppGatewayClient
         return gatewaySslCertificate;
     }
 
-    public IEnumerable<CurrentInventoryItem> GetAppGatewaySslCertificates()
+    public OperationResult<IEnumerable<CurrentInventoryItem>> GetAppGatewaySslCertificates()
     {
-
         ApplicationGatewayResource appGatewayResource =
             _armClient.GetApplicationGatewayResource(AppGatewayResourceId).Get();
         _logger.LogDebug($"Getting SSL certificates from App Gateway called \"{appGatewayResource.Data.Name}\"");
         _logger.LogDebug($"There are {appGatewayResource.Data.SslCertificates.Count()} certificates in the response.");
         List<CurrentInventoryItem> inventoryItems = new List<CurrentInventoryItem>();
+
+        OperationResult<IEnumerable<CurrentInventoryItem>> result = new(inventoryItems);
 
         foreach (ApplicationGatewaySslCertificate certObject in appGatewayResource.Data.SslCertificates)
         {
@@ -316,15 +317,19 @@ public class GatewayClient : IAzureAppGatewayClient
                 }
                 catch (Exception e)
                 {
-                    string error = $"Error retrieving certificate from Azure Key Vault with ID {certObject.KeyVaultSecretId}: {e.Message}";
-                    _logger.LogError(error);
-                    throw new Exception(error);
+                    string error = $"Failed to download certificate from Azure Key Vault with ID {certObject.KeyVaultSecretId}";
+                    _logger.LogError(error + $": {e.Message}");
+
+                    result.AddRuntimeErrorMessage(error);
+                    continue;
                 }
             }
             else 
             {
-                _logger.LogError($"Certificate called \"{certObject.Name}\" ({certObject.Id}) does not have any public certificate data or Key Vault secret ID.");
+                string error = $"Certificate called \"{certObject.Name}\" ({certObject.Id}) does not have any public certificate data or Key Vault secret ID.";
+                _logger.LogError(error);
 
+                result.AddRuntimeErrorMessage(error);
                 continue;
             }
 
@@ -341,8 +346,13 @@ public class GatewayClient : IAzureAppGatewayClient
             inventoryItems.Add(inventoryItem);
         }
 
+        if (!result.Success)
+        {
+            result.ErrorSummary = $"Application Gateway Certificate inventory may be incomplete. Successfully read {inventoryItems.Count()}/{appGatewayResource.Data.SslCertificates.Count()} certificates present in the Application Gateway called {AppGatewayResourceId.Name} ({AppGatewayResourceId})\nPlease see Orchestrator logs for more details. Error summary:";
+        }
+
         _logger.LogDebug($"Found {inventoryItems.Count()} certificates in app gateway");
-        return inventoryItems;
+        return result;
     }
 
     public void UpdateHttpsListenerCertificate(ApplicationGatewaySslCertificate certificate, string listenerName)

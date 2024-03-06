@@ -4,7 +4,7 @@
     "integration_type": "orchestrator",
     "status": "production",
     "description": "The Azure Application Gateway Orchestrator Extension is an extension to the Keyfactor Universal Orchestrator that allows for the management of certificates on Azure Application Gateways, including the ability to add and bind certificates to HTTPS listeners.",
-    "support_level": "kf-community",
+    "support_level": "kf-supported",
     "release_dir": "AzureAppGatewayOrchestrator\\bin\\Release",
     "link_github": true,
     "update_catalog": true,

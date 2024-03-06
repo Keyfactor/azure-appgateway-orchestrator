@@ -62,33 +62,6 @@ setup: ## Setup the environment for development
 		echo "PROJECT_NAME=$$(basename $$(dirname $$(grep PROJECT_FILE .env | cut -d '=' -f 2)))" >> .env; \
 	fi
 
-.PHONY: newtest
-newtest: setup ## Create a new test project
-	@source .env; \
-	testProjectName="$$PROJECT_NAME".Tests; \
-	echo "Creating new xUnit project called $$testProjectName"; \
-	dotnet new xunit -o $$testProjectName; \
-	dotnet sln add $$testProjectName/$$testProjectName.csproj; \
-	dotnet add $$testProjectName reference $$PROJECT_FILE;
-
-.PHONY: installpackage
-installpackage: ## Install a package to the project
-	@source .env; \
-	echo "Select a project to install the package into"; \
-	PS3="Selection: "; \
-	select opt in $$(ls */*.csproj); do \
-		if [ -n "$$opt" ]; then \
-			echo "You have selected $$opt"; \
-			break; \
-		else \
-			echo "Invalid selection. Please try again."; \
-		fi; \
-	done; \
-	echo "Enter the package name to install: "; \
-	read packageName; \
-	echo "Installing $$packageName to $$opt"; \
-	dotnet add $$opt package $$packageName;
-
 .PHONY: testall
 testall: ## Run all tests.
 	@source .env; \
@@ -105,7 +78,7 @@ test: ## Run a single test.
 	cut -d ' ' -f 5- | \
 	sed 's/(.*//i' | \
 	sort | uniq | \
-	fzf | \
+	fzf  | \
 	xargs -I {} dotnet test --filter {} --logger "console;verbosity=detailed"
 
 ##@ Build

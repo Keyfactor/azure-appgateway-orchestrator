@@ -74,7 +74,7 @@ public class FakeClient : IAzureAppGatewayClient
     public IEnumerable<string>? AppGatewaysAvailableOnFakeTenant { get; set; }
     public Dictionary<string, ApplicationGatewaySslCertificate>? CertificatesAvailableOnFakeAppGateway { get; set; }
 
-    public IEnumerable<CurrentInventoryItem> GetAppGatewaySslCertificates()
+    public OperationResult<IEnumerable<CurrentInventoryItem>> GetAppGatewaySslCertificates()
     {
         _logger.LogDebug("Getting App Gateway SSL Certificates from fake app gateway");
 
@@ -84,6 +84,8 @@ public class FakeClient : IAzureAppGatewayClient
         }
 
         List<CurrentInventoryItem> inventoryItems = new List<CurrentInventoryItem>();
+        OperationResult<IEnumerable<CurrentInventoryItem>> result = new(inventoryItems);
+
         foreach (ApplicationGatewaySslCertificate cert in CertificatesAvailableOnFakeAppGateway.Values)
         {
             inventoryItems.Add(new CurrentInventoryItem
@@ -98,7 +100,7 @@ public class FakeClient : IAzureAppGatewayClient
 
         _logger.LogDebug($"Fake client has {inventoryItems.Count} certificates in inventory");
 
-        return inventoryItems;
+        return result;
     }
 
     public ApplicationGatewaySslCertificate AddCertificate(string certificateName, string certificateData, string certificatePassword)

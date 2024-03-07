@@ -14,7 +14,6 @@
 
 using System.Security.Cryptography.X509Certificates;
 using Azure.ResourceManager.Network.Models;
-using AzureApplicationGatewayOrchestratorExtension;
 using AzureApplicationGatewayOrchestratorExtension.AppGatewayCertificateJobs;
 using AzureApplicationGatewayOrchestratorExtension.Client;
 using Keyfactor.Logging;

@@ -55,6 +55,12 @@
                             "Required": true
                         },
                         {
+                            "Name": "ClientCertificate",
+                            "DisplayName": "Client Certificate",
+                            "Type": "Secret",
+                            "Required": false
+                        },
+                        {
                             "Name": "ServerUseSsl",
                             "DisplayName": "Use SSL",
                             "Type": "Bool",
@@ -102,6 +108,12 @@
                         {
                             "Name": "ServerPassword",
                             "DisplayName": "Server Password",
+                            "Type": "Secret",
+                            "Required": false
+                        },
+                        {
+                            "Name": "ClientCertificate",
+                            "DisplayName": "Client Certificate",
                             "Type": "Secret",
                             "Required": false
                         },

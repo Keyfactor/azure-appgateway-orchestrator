@@ -13,32 +13,33 @@
 // limitations under the License.
 
 using System.Collections.Generic;
+using System.Security.Cryptography.X509Certificates;
 using Azure.ResourceManager.Network.Models;
 using Keyfactor.Orchestrators.Extensions;
 
-namespace AzureApplicationGatewayOrchestratorExtension.Client
+namespace AzureApplicationGatewayOrchestratorExtension.Client;
+
+public interface IAzureAppGatewayClientBuilder
 {
-    public interface IAzureAppGatewayClientBuilder
-    {
-        public IAzureAppGatewayClientBuilder WithTenantId(string tenantId);
-        public IAzureAppGatewayClientBuilder WithResourceId(string resourceId);
-        public IAzureAppGatewayClientBuilder WithApplicationId(string applicationId);
-        public IAzureAppGatewayClientBuilder WithClientSecret(string clientSecret);
-        public IAzureAppGatewayClientBuilder WithAzureCloud(string azureCloud);
-        public IAzureAppGatewayClient Build();
-    }
+    public IAzureAppGatewayClientBuilder WithTenantId(string tenantId);
+    public IAzureAppGatewayClientBuilder WithResourceId(string resourceId);
+    public IAzureAppGatewayClientBuilder WithApplicationId(string applicationId);
+    public IAzureAppGatewayClientBuilder WithClientSecret(string clientSecret);
+    public IAzureAppGatewayClientBuilder WithClientCertificate(X509Certificate2 clientCertificate);
+    public IAzureAppGatewayClientBuilder WithAzureCloud(string azureCloud);
+    public IAzureAppGatewayClient Build();
+}
 
-    public interface IAzureAppGatewayClient
-    {
-        public ApplicationGatewaySslCertificate AddCertificate(string certificateName, string certificateData, string certificatePassword);
-        public void RemoveCertificate(string certificateName);
-        public IEnumerable<CurrentInventoryItem> GetAppGatewaySslCertificates();
-        public ApplicationGatewaySslCertificate GetAppGatewayCertificateByName(string certificateName);
-        public bool CertificateExists(string certificateName);
-        public IEnumerable<string> DiscoverApplicationGateways();
+public interface IAzureAppGatewayClient
+{
+    public ApplicationGatewaySslCertificate AddCertificate(string certificateName, string certificateData, string certificatePassword);
+    public void RemoveCertificate(string certificateName);
+    public IEnumerable<CurrentInventoryItem> GetAppGatewaySslCertificates();
+    public ApplicationGatewaySslCertificate GetAppGatewayCertificateByName(string certificateName);
+    public bool CertificateExists(string certificateName);
+    public IEnumerable<string> DiscoverApplicationGateways();
 
-        public bool CertificateIsBoundToHttpsListener(string certificateName);
-        public void UpdateHttpsListenerCertificate(ApplicationGatewaySslCertificate certificate, string listenerName);
-        public IDictionary<string, string> GetBoundHttpsListenerCertificates();
-    }
+    public bool CertificateIsBoundToHttpsListener(string certificateName);
+    public void UpdateHttpsListenerCertificate(ApplicationGatewaySslCertificate certificate, string listenerName);
+    public IDictionary<string, string> GetBoundHttpsListenerCertificates();
 }

@@ -17,3 +17,6 @@
   - chore(jobs): Refactored Orchestrator job implementations to prefer dependency injection pattern.
   - chore(tests): Implemented unit testing framework with a fake client interface.
   - chore(tests): Implemented integration tests for both Orchestrator jobs and App Gateway client.
+
+- 2.1.0
+  - chore(client): Pass error back to Command if certificate download from AKV fails

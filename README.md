@@ -38,7 +38,7 @@ The Keyfactor Universal Orchestrator may be installed on either Windows or Linux
 |Supports Management Remove|&check; |&check; |
 |Supports Create Store|  |  |
 |Supports Discovery|&check; |&check; |
-|Supports Renrollment|  |  |
+|Supports Reenrollment|  |  |
 |Supports Inventory|&check; |&check; |
 
 
@@ -274,4 +274,7 @@ In Keyfactor Command, navigate to Certificate Stores from the Locations Menu. Cl
 
 
 </details>
+
+When creating cert store type manually, that store property names and entry parameter names are case sensitive
+
 

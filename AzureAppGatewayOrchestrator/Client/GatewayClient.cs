@@ -188,16 +188,16 @@ public class GatewayClient : IAzureAppGatewayClient
 
         string secretName = null;
         string version = null;
-        if (vaultUri.Segments.Length == 2)
+        if (vaultUri.Segments.Length == 3)
         {
             secretName = vaultUri.Segments.Last().TrimEnd('/');
             _logger.LogTrace($"Retrieving secret called \"{secretName}\" from Azure Key Vault");
         }
-        else if (vaultUri.Segments.Length == 3)
+        else if (vaultUri.Segments.Length == 4)
         {
-            secretName = vaultUri.Segments[1].TrimEnd('/');
+            secretName = vaultUri.Segments[2].TrimEnd('/');
             version = vaultUri.Segments.Last().TrimEnd('/');
-            _logger.LogTrace($"Retrieving secret called \"{secretName}\" with version \"{secretName} from Azure Key Vault");
+            _logger.LogTrace($"Retrieving secret called \"{secretName}\" with version \"{version}\" from Azure Key Vault");
         }
         else
         {

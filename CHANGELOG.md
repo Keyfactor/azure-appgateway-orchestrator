@@ -20,3 +20,8 @@
 
 - 2.1.0
   - chore(client): Pass error back to Command if certificate download from AKV fails
+
+- 3.0.0
+  - feat(certauth): Implement client certificate authentication as an alternative authentication mechanism.
+  - chore(docs): Update documentation to discuss the Key Vault Azure role-based access control permission model.
+  - fix(akv): Refactor Azure Key Vault certificate retrieval mechanism to recognize and appropriately handle secret versions.

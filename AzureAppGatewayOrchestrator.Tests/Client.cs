@@ -93,12 +93,12 @@ public class Client
         // Step 3 - Get the certificates that exist on the app gateway
 
         // Act
-        IEnumerable<Keyfactor.Orchestrators.Extensions.CurrentInventoryItem> certs = client.GetAppGatewaySslCertificates();
+        OperationResult<IEnumerable<Keyfactor.Orchestrators.Extensions.CurrentInventoryItem>> certs = client.GetAppGatewaySslCertificates();
 
         // Assert
-        Assert.NotNull(certs);
-        Assert.NotEmpty(certs);
-        Assert.Contains(certs, c => c.Alias == certName);
+        Assert.NotNull(certs.Result);
+        Assert.NotEmpty(certs.Result);
+        Assert.Contains(certs.Result, c => c.Alias == certName);
 
         // Step 4 - Try to remove the certificate from the app gateway, which should fail 
         // since it's bound to an HTTPS listener
@@ -125,7 +125,7 @@ public class Client
         // Rebind the HTTPS listener with the original certificate, if there was only 1 certificate
         // previously, otherwise bind it with the first certificate in the list.
 
-        ApplicationGatewaySslCertificate replacement = client.GetAppGatewayCertificateByName(certs.First(c => c.Alias != certName).Alias);
+        ApplicationGatewaySslCertificate replacement = client.GetAppGatewayCertificateByName(certs.Result.First(c => c.Alias != certName).Alias);
 
         client.UpdateHttpsListenerCertificate(replacement, env.HttpsListenerName);
 

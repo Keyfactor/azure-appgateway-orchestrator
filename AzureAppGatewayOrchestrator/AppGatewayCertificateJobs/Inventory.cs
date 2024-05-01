@@ -51,9 +51,32 @@ public class Inventory : IInventoryJobExtension
 
         try
         {
-            inventoryItems = Client.GetAppGatewaySslCertificates().ToList();
+            OperationResult<IEnumerable<CurrentInventoryItem>> inventoryResult = Client.GetAppGatewaySslCertificates();
+            if (!inventoryResult.Success)
+            {
+                // Aggregate the messages into the failure message. Since an exception wasn't thrown,
+                // we still have a partial success. We want to return a warning.
+                result.FailureMessage += inventoryResult.ErrorMessage; 
+                result.Result = OrchestratorJobStatusJobResult.Warning;
+                _logger.LogWarning(result.FailureMessage);
+            } 
+            else
+            {
+                result.Result = OrchestratorJobStatusJobResult.Success;
+            }
+
+            // At least partial success is guaranteed, so we can continue with the inventory items
+            // that we were able to pull down.
+            inventoryItems = inventoryResult.Result.ToList();
+
         } catch (Exception ex)
         {
+            // Exception is triggered if we weren't able to pull down the list of certificates
+            // from Azure. This could be due to a number of reasons, including network issues,
+            // or the user not having the correct permissions. An exception won't be triggered
+            // if there are no certificates in the App Gateway, or if we weren't able to assemble
+            // the list of certificates into a CurrentInventoryItem.
+
             _logger.LogError(ex, "Error getting App Gateway SSL Certificates:\n" + ex.Message);
             result.FailureMessage = "Error getting App Gateway SSL Certificates:\n" + ex.Message;
             return result;
@@ -64,7 +87,6 @@ public class Inventory : IInventoryJobExtension
         //cb.DynamicInvoke(inventoryItems);
         cb(inventoryItems);
 
-        result.Result = OrchestratorJobStatusJobResult.Success;
         return result;
     }
 }

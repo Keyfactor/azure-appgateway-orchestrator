@@ -30,11 +30,31 @@ public interface IAzureAppGatewayClientBuilder
     public IAzureAppGatewayClient Build();
 }
 
+public class OperationResult<T>
+{
+    public T Result { get; set; }
+    public string ErrorSummary { get; set; }
+    public List<string> Messages { get; set; } = new List<string>();
+    public bool Success => Messages.Count == 0;
+
+    public OperationResult(T result)
+    {
+        Result = result;
+    }
+
+    public void AddRuntimeErrorMessage(string message)
+    {
+        Messages.Add("  - " + message);
+    }
+
+    public string ErrorMessage => $"{ErrorSummary}\n{string.Join("\n", Messages)}";
+}
+
 public interface IAzureAppGatewayClient
 {
     public ApplicationGatewaySslCertificate AddCertificate(string certificateName, string certificateData, string certificatePassword);
     public void RemoveCertificate(string certificateName);
-    public IEnumerable<CurrentInventoryItem> GetAppGatewaySslCertificates();
+    public OperationResult<IEnumerable<CurrentInventoryItem>> GetAppGatewaySslCertificates();
     public ApplicationGatewaySslCertificate GetAppGatewayCertificateByName(string certificateName);
     public bool CertificateExists(string certificateName);
     public IEnumerable<string> DiscoverApplicationGateways();

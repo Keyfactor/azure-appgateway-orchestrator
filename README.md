@@ -1,3 +1,53 @@
+
+# Azure Application Gateway Orchestrator
+
+The Azure Application Gateway Orchestrator Extension is an extension to the Keyfactor Universal Orchestrator that allows for the management of certificates on Azure Application Gateways, including the ability to add and bind certificates to HTTPS listeners.
+
+#### Integration status: Production - Ready for use in production environments.
+
+## About the Keyfactor Universal Orchestrator Extension
+
+This repository contains a Universal Orchestrator Extension which is a plugin to the Keyfactor Universal Orchestrator. Within the Keyfactor Platform, Orchestrators are used to manage “certificate stores” &mdash; collections of certificates and roots of trust that are found within and used by various applications.
+
+The Universal Orchestrator is part of the Keyfactor software distribution and is available via the Keyfactor customer portal. For general instructions on installing Extensions, see the “Keyfactor Command Orchestrator Installation and Configuration Guide” section of the Keyfactor documentation. For configuration details of this specific Extension see below in this readme.
+
+The Universal Orchestrator is the successor to the Windows Orchestrator. This Orchestrator Extension plugin only works with the Universal Orchestrator and does not work with the Windows Orchestrator.
+
+## Support for Azure Application Gateway Orchestrator
+
+Azure Application Gateway Orchestrator is supported by Keyfactor for Keyfactor customers. If you have a support issue, please open a support ticket via the Keyfactor Support Portal at https://support.keyfactor.com
+
+###### To report a problem or suggest a new feature, use the **[Issues](../../issues)** tab. If you want to contribute actual bug fixes or proposed enhancements, use the **[Pull requests](../../pulls)** tab.
+
+---
+
+
+---
+
+
+
+## Keyfactor Version Supported
+
+The minimum version of the Keyfactor Universal Orchestrator Framework needed to run this version of the extension is 10.4
+## Platform Specific Notes
+
+The Keyfactor Universal Orchestrator may be installed on either Windows or Linux based platforms. The certificate operations supported by a capability may vary based what platform the capability is installed on. The table below indicates what capabilities are supported based on which platform the encompassing Universal Orchestrator is running.
+| Operation | Win | Linux |
+|-----|-----|------|
+|Supports Management Add|&check; |&check; |
+|Supports Management Remove|&check; |&check; |
+|Supports Create Store|  |  |
+|Supports Discovery|&check; |&check; |
+|Supports Reenrollment|  |  |
+|Supports Inventory|&check; |&check; |
+
+
+
+
+
+---
+
+
 <h1 align="center" style="border-bottom: none">
     Azure Application Gateway Universal Orchestrator Extension
 </h1>
@@ -37,14 +87,6 @@ The Azure Application Gateway Orchestrator extension remotely manages certificat
 >
 > If the certificate management capabilities of Azure Key Vault are desired over direct management of certificates in Application Gateways, the Azure Key Vault orchestrator can be used in conjunction with this extension for accurate certificate location reporting via the inventory job type. This management strategy requires manual binding of certificates imported to an Application Gateway from AKV and can result in broken state in the Azure Application Gateway in the case that the secret is deleted in AKV.
 
-## Compatibility
-
-This integration is compatible with Keyfactor Universal Orchestrator version 10.4 and later.
-
-## Support
-The Azure Application Gateway Universal Orchestrator extension is supported by Keyfactor for Keyfactor customers. If you have a support issue, please open a support ticket with your Keyfactor representative. If you have a support issue, please open a support ticket via the Keyfactor Support Portal at https://support.keyfactor.com. 
- 
-> To report a problem or suggest a new feature, use the **[Issues](../../issues)** tab. If you want to contribute actual bug fixes or proposed enhancements, use the **[Pull requests](../../pulls)** tab.
 
 ## Installation
 Before installing the Azure Application Gateway Universal Orchestrator extension, it's recommended to install [kfutil](https://github.com/Keyfactor/kfutil). Kfutil is a command-line tool that simplifies the process of creating store types, installing extensions, and instantiating certificate stores in Keyfactor Command.
@@ -59,6 +101,7 @@ The Azure Application Gateway Universal Orchestrator extension implements 2 Cert
 1. Follow the [requirements section](docs/azureappgw.md#requirements) to configure a Service Account and grant necessary API permissions.
 
     <details><summary>Requirements</summary>
+    
     ### Azure Service Principal (Azure Resource Manager Authentication)
 
     The Azure Application Gateway Orchestrator extension uses an [Azure Service Principal](https://learn.microsoft.com/en-us/entra/identity-platform/app-objects-and-service-principals?tabs=browser) for authentication. Follow [Microsoft's documentation](https://learn.microsoft.com/en-us/entra/identity-platform/howto-create-service-principal-portal) to create a service principal.
@@ -170,6 +213,7 @@ The Azure Application Gateway Universal Orchestrator extension implements 2 Cert
 1. Follow the [requirements section](docs/appgwbin.md#requirements) to configure a Service Account and grant necessary API permissions.
 
     <details><summary>Requirements</summary>
+
     ### Azure Service Principal (Azure Resource Manager Authentication)
 
     The Azure Application Gateway Orchestrator extension uses an [Azure Service Principal](https://learn.microsoft.com/en-us/entra/identity-platform/app-objects-and-service-principals?tabs=browser) for authentication. Follow [Microsoft's documentation](https://learn.microsoft.com/en-us/entra/identity-platform/howto-create-service-principal-portal) to create a service principal.
@@ -283,3 +327,7 @@ Apache License 2.0, see [LICENSE](LICENSE).
 ## Related Integrations
 
 See all [Keyfactor Universal Orchestrator extensions](https://github.com/orgs/Keyfactor/repositories?q=orchestrator).
+
+When creating cert store type manually, that store property names and entry parameter names are case sensitive
+
+

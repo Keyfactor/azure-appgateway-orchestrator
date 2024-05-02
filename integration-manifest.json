@@ -157,29 +157,7 @@
                     "BlueprintAllowed": false,
                     "CustomAliasAllowed": "Required"
                 }
-            ],
-            "store_types_metadata": {
-                "AzureAppGw": {
-                    "ClientMachine": "The Azure Tenant ID of the service principal, representing the Tenant ID where the Application/Service Principal is managed.",
-                    "StorePath": "Azure resource ID of the application gateway, following the format: `/subscriptions/<subscription-id>/resourceGroups/<resource-group-name>/providers/Microsoft.Network/applicationGateways/<application-gateway-name>`.",
-                    "Properties": {
-                        "ServerUsername": "Application ID of the service principal, representing the identity used for managing the Application Gateway.",
-                        "ServerPassword": "Secret of the service principal that will be used to manage the Application Gateway.",
-                        "ServerUseSsl": "Indicates whether SSL usage is enabled for the connection.",
-                        "AzureCloud": "Specifies the Azure Cloud instance used by the organization."
-                    }
-                },
-                "AppGwBin": {
-                    "ClientMachine": "The Azure Tenant ID of the service principal, representing the Tenant ID where the Application/Service Principal is managed.",
-                    "StorePath": "Azure resource ID of the application gateway, following the format: `/subscriptions/<subscription-id>/resourceGroups/<resource-group-name>/providers/Microsoft.Network/applicationGateways/<application-gateway-name>`.",
-                    "Properties": {
-                        "ServerUsername": "Application ID of the service principal, representing the identity used for managing the Application Gateway.",
-                        "ServerPassword": "Secret of the service principal that will be used to manage the Application Gateway.",
-                        "ServerUseSsl": "Indicates whether SSL usage is enabled for the connection.",
-                        "AzureCloud": "Specifies the Azure Cloud instance used by the organization."
-                    }
-                }
-            }
+            ]
         }
     }
 }

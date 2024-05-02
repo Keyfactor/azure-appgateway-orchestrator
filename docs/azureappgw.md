@@ -176,11 +176,11 @@ Custom fields operate at the certificate store level and are used to control how
 
 | Name | Display Name | Type | Default Value/Options | Required | Description |
 | ---- | ------------ | ---- | --------------------- | -------- | ----------- |
-| ServerUsername | Server Username | Secret |  | ✅ |  |
-| ServerPassword | Server Password | Secret |  | ✅ |  |
-| ClientCertificate | Client Certificate | Secret |  |  |  |
-| ServerUseSsl | Use SSL | Bool | true |  |  |
-| AzureCloud | Azure Global Cloud Authority Host | MultipleChoice | public,china,germany,government |  |  |
+| ServerUsername | Server Username | Secret |  |  | Application ID of the service principal, representing the identity used for managing the Application Gateway. |
+| ServerPassword | Server Password | Secret |  |  | A Client Secret that the extension will use to authenticate with the Azure Resource Management API for managing Application Gateway certificates, OR the password that encrypts the private key in ClientCertificate |
+| ClientCertificate | Client Certificate | Secret |  |  | The client certificate used to authenticate with Azure Resource Management API for managing Application Gateway certificates. See the [requirements](#client-certificate-or-client-secret) for more information. |
+| AzureCloud | Azure Global Cloud Authority Host | MultipleChoice | public,china,germany,government |  | Specifies the Azure Cloud instance used by the organization. |
+| ServerUseSsl | Use SSL | Bool | true | ✅ | Specifies whether SSL should be used for communication with the server. Set to 'true' to enable SSL, and 'false' to disable it. |
 
 
 The Custom Fields tab should look like this:
@@ -201,14 +201,14 @@ The following table describes the required and optional fields for the `AzureApp
 | --------- | ----------- |
 | Category | Select "Azure Application Gateway Certificate" or the customized certificate store name from the previous step. |
 | Container | Optional container to associate certificate store with. |
-| Client Machine |  |
-| Store Path |  |
+| Client Machine | The Azure Tenant (directory) ID that owns the Service Principal. |
+| Store Path | Azure resource ID of the application gateway, following the format: /subscriptions/<subscription-id>/resourceGroups/<resource-group-name>/providers/Microsoft.Network/applicationGateways/<application-gateway-name>. |
 | Orchestrator | Select an approved orchestrator capable of managing `AzureAppGw` certificates. Specifically, one with the `AzureAppGw` capability. |
-| ServerUsername |  |
-| ServerPassword |  |
-| ClientCertificate |  |
-| ServerUseSsl |  |
-| AzureCloud |  |
+| ServerUsername | Application ID of the service principal, representing the identity used for managing the Application Gateway. |
+| ServerPassword | A Client Secret that the extension will use to authenticate with the Azure Resource Management API for managing Application Gateway certificates, OR the password that encrypts the private key in ClientCertificate |
+| ClientCertificate | The client certificate used to authenticate with Azure Resource Management API for managing Application Gateway certificates. See the [requirements](#client-certificate-or-client-secret) for more information. |
+| AzureCloud | Specifies the Azure Cloud instance used by the organization. |
+| ServerUseSsl | Specifies whether SSL should be used for communication with the server. Set to 'true' to enable SSL, and 'false' to disable it. |
 
 * **Using kfutil**
 

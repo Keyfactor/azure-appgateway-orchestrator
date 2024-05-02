@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.Security.Cryptography.X509Certificates;
 using Azure.ResourceManager.Network.Models;
 using AzureApplicationGatewayOrchestratorExtension.Client;
 using Keyfactor.Logging;
@@ -23,51 +24,58 @@ namespace AzureAppGatewayOrchestrator.Tests;
 
 public class FakeClient : IAzureAppGatewayClient
 {
-        public class FakeBuilder : IAzureAppGatewayClientBuilder
+    public class FakeBuilder : IAzureAppGatewayClientBuilder
+    {
+        private FakeClient _client = new FakeClient();
+
+        public string? _tenantId { get; set; }
+        public string? _resourceId { get; set; }
+        public string? _applicationId { get; set; }
+        public string? _clientSecret { get; set; }
+        public X509Certificate2? _clientCertificate { get; set; }
+        public string? _azureCloudEndpoint { get; set; }
+
+        public IAzureAppGatewayClientBuilder WithTenantId(string tenantId)
         {
-            private FakeClient _client = new FakeClient();
-
-            public string _tenantId { get; set; }
-            public string _resourceId { get; set; }
-            public string _applicationId { get; set; }
-            public string _clientSecret { get; set; }
-            public string _azureCloudEndpoint { get; set; }
-
-            public IAzureAppGatewayClientBuilder WithTenantId(string tenantId)
-            {
-                _tenantId = tenantId;
-                return this;
-            }
-
-            public IAzureAppGatewayClientBuilder WithResourceId(string resourceId)
-            {
-                _resourceId = resourceId;
-                return this;
-            }
-
-            public IAzureAppGatewayClientBuilder WithApplicationId(string applicationId)
-            {
-                _applicationId = applicationId;
-                return this;
-            }
-
-            public IAzureAppGatewayClientBuilder WithClientSecret(string clientSecret)
-            {
-                _clientSecret = clientSecret;
-                return this;
-            }
-
-            public IAzureAppGatewayClientBuilder WithAzureCloud(string azureCloud)
-            {
-                _azureCloudEndpoint = azureCloud;
-                return this;
-            }
-
-            public IAzureAppGatewayClient Build()
-            {
-                return _client;
-            }
+            _tenantId = tenantId;
+            return this;
         }
+
+        public IAzureAppGatewayClientBuilder WithResourceId(string resourceId)
+        {
+            _resourceId = resourceId;
+            return this;
+        }
+
+        public IAzureAppGatewayClientBuilder WithApplicationId(string applicationId)
+        {
+            _applicationId = applicationId;
+            return this;
+        }
+
+        public IAzureAppGatewayClientBuilder WithClientSecret(string clientSecret)
+        {
+            _clientSecret = clientSecret;
+            return this;
+        }
+
+        public IAzureAppGatewayClientBuilder WithClientCertificate(X509Certificate2 clientCertificate)
+        {
+            _clientCertificate = clientCertificate;
+            return this;
+        }
+
+        public IAzureAppGatewayClientBuilder WithAzureCloud(string azureCloud)
+        {
+            _azureCloudEndpoint = azureCloud;
+            return this;
+        }
+
+        public IAzureAppGatewayClient Build()
+        {
+            return _client;
+        }
+    }
 
     ILogger _logger = LogHandler.GetClassLogger<FakeClient>();
 
@@ -89,13 +97,13 @@ public class FakeClient : IAzureAppGatewayClient
         foreach (ApplicationGatewaySslCertificate cert in CertificatesAvailableOnFakeAppGateway.Values)
         {
             inventoryItems.Add(new CurrentInventoryItem
-            {
-                Alias = cert.Name,
-                PrivateKeyEntry = false,
-                ItemStatus = OrchestratorInventoryItemStatus.Unknown,
-                UseChainLevel = true,
-                Certificates = new List<string> { cert.Name }
-            });
+                    {
+                    Alias = cert.Name,
+                    PrivateKeyEntry = false,
+                    ItemStatus = OrchestratorInventoryItemStatus.Unknown,
+                    UseChainLevel = true,
+                    Certificates = new List<string> { cert.Name }
+                    });
         }
 
         _logger.LogDebug($"Fake client has {inventoryItems.Count} certificates in inventory");
@@ -115,9 +123,9 @@ public class FakeClient : IAzureAppGatewayClient
         ApplicationGatewaySslCertificate cert = new ApplicationGatewaySslCertificate
         {
             Name = certificateName,
-            Data = BinaryData.FromObjectAsJson(certificateData),
-            // Reserve the Password field for tracking certificates bound to HTTPS listeners
-            Password = ""
+                 Data = BinaryData.FromObjectAsJson(certificateData),
+                 // Reserve the Password field for tracking certificates bound to HTTPS listeners
+                 Password = ""
         };
 
         _logger.LogDebug($"Adding certificate {certificateName} to fake app gateway");

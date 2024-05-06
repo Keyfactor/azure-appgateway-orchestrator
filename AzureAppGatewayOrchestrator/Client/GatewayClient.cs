@@ -65,6 +65,7 @@ public class GatewayClient : IAzureAppGatewayClient
         private string _resourceId { get; set; }
         private string _applicationId { get; set; }
         private string _clientSecret { get; set; }
+        private X509Certificate2 _clientCertificate { get; set; }
         private Uri _azureCloudEndpoint { get; set; }
 
         public IAzureAppGatewayClientBuilder WithTenantId(string tenantId)
@@ -88,6 +89,12 @@ public class GatewayClient : IAzureAppGatewayClient
         public IAzureAppGatewayClientBuilder WithClientSecret(string clientSecret)
         {
             _clientSecret = clientSecret;
+            return this;
+        }
+
+        public IAzureAppGatewayClientBuilder WithClientCertificate(X509Certificate2 clientCertificate)
+        {
+            _clientCertificate = clientCertificate;
             return this;
         }
 
@@ -129,9 +136,23 @@ public class GatewayClient : IAzureAppGatewayClient
                               AdditionallyAllowedTenants = { "*" } 
             };
 
-            TokenCredential credential = new ClientSecretCredential(
-                    _tenantId, _applicationId, _clientSecret, credentialOptions
-                    );
+            TokenCredential credential;
+            if (!string.IsNullOrWhiteSpace(_clientSecret)) 
+            {
+                credential = new ClientSecretCredential(
+                        _tenantId, _applicationId, _clientSecret, credentialOptions
+                        );
+            }
+            else if (_clientCertificate != null) 
+            {
+                credential = new ClientCertificateCredential(
+                        _tenantId, _applicationId, _clientCertificate, credentialOptions
+                        );
+            }
+            else 
+            {
+                throw new Exception("Client secret or client certificate must be provided.");
+            }
 
             // Creating Azure Resource Management client with the specified credentials.
             ArmClient armClient = new ArmClient(credential);
@@ -159,14 +180,31 @@ public class GatewayClient : IAzureAppGatewayClient
             }
         };
 
-        // vaultId in the form of https://<vault-name>.vault.azure.net/secrets/<secret-name>
+        // vaultId in the form of https://<vault-name>.vault.azure.net/secrets/<secret-name>[/<version>]
         Uri vaultUri = new Uri(vaultId);
 
         _logger.LogTrace($"Creating SecretClient object with URI {vaultUri.Scheme + "://" + vaultUri.Host}");
         SecretClient client = new SecretClient(new Uri(vaultUri.Scheme + "://" + vaultUri.Host), _credential, options);
 
-        _logger.LogTrace($"Retrieving secret called \"{vaultUri.Segments.Last()}\" from Azure Key Vault");
-        KeyVaultSecret secret = client.GetSecret(vaultUri.Segments.Last());
+        string secretName = null;
+        string version = null;
+        if (vaultUri.Segments.Length == 3)
+        {
+            secretName = vaultUri.Segments.Last().TrimEnd('/');
+            _logger.LogTrace($"Retrieving secret called \"{secretName}\" from Azure Key Vault");
+        }
+        else if (vaultUri.Segments.Length == 4)
+        {
+            secretName = vaultUri.Segments[2].TrimEnd('/');
+            version = vaultUri.Segments.Last().TrimEnd('/');
+            _logger.LogTrace($"Retrieving secret called \"{secretName}\" with version \"{version}\" from Azure Key Vault");
+        }
+        else
+        {
+            throw new Exception($"Invalid Azure Key Vault secret ID: {vaultId}");
+        }
+
+        KeyVaultSecret secret = client.GetSecret(secretName, version);
 
         if (String.IsNullOrWhiteSpace(secret.Properties.ContentType) || secret.Properties.ContentType != "application/x-pkcs12")
         {

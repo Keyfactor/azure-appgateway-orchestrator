@@ -25,3 +25,6 @@
   - feat(certauth): Implement client certificate authentication as an alternative authentication mechanism.
   - chore(docs): Update documentation to discuss the Key Vault Azure role-based access control permission model.
   - fix(akv): Refactor Azure Key Vault certificate retrieval mechanism to recognize and appropriately handle secret versions.
+
+- 3.1.0
+  - fix(deps): Revert main Azure Application Gateway Orchestrator extension .NET project to .NET 6 from .NET 8.

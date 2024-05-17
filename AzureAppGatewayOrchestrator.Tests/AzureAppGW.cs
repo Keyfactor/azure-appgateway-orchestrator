@@ -24,15 +24,15 @@ using NLog.Extensions.Logging;
 
 namespace AzureAppGatewayOrchestrator.Tests;
 
-public class AzureAppGatewayOrchestrator_AzureAppGw
+public class AzureAppGw
 {
     ILogger _logger { get; set;}
 
-    public AzureAppGatewayOrchestrator_AzureAppGw()
+    public AzureAppGw()
     {
         ConfigureLogging();
 
-        _logger = LogHandler.GetClassLogger<AzureAppGatewayOrchestrator_AzureAppGw>();
+        _logger = LogHandler.GetClassLogger<AzureAppGw>();
     }
 
     [IntegrationTestingFact]
@@ -544,7 +544,7 @@ public class AzureAppGatewayOrchestrator_AzureAppGw
         string certName = "GatewayTest" + Guid.NewGuid().ToString()[..6];
         string password = "password";
 
-        X509Certificate2 ssCert = AzureAppGatewayOrchestrator_Client.GetSelfSignedCert(testHostname);
+        X509Certificate2 ssCert = Client.GetSelfSignedCert(testHostname);
 
         string b64PfxSslCert = Convert.ToBase64String(ssCert.Export(X509ContentType.Pfx, password));
 
@@ -577,7 +577,7 @@ public class AzureAppGatewayOrchestrator_AzureAppGw
 
         // Arrange
 
-        ssCert = AzureAppGatewayOrchestrator_Client.GetSelfSignedCert(testHostname);
+        ssCert = Client.GetSelfSignedCert(testHostname);
 
         b64PfxSslCert = Convert.ToBase64String(ssCert.Export(X509ContentType.Pfx, password));
         

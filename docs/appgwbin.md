@@ -170,8 +170,8 @@ The following table describes the required and optional fields for the `AppGwBin
 | --------- | ----------- | ------------------------- |
 | Category | Select "Azure Application Gateway Certificate Binding" or the customized certificate store name from the previous step. | |
 | Container | Optional container to associate certificate store with. | |
-| Client Machine | The Azure Tenant (directory) ID that owns the Service Principal. | |
-| Store Path | Azure resource ID of the application gateway, following the format: /subscriptions/<subscription-id>/resourceGroups/<resource-group-name>/providers/Microsoft.Network/applicationGateways/<application-gateway-name>. | |
+| Client Machine | The fully qualified domain name (FQDN) or the IP address of the Azure Application Gateway. Example: myappgateway.example.com | |
+| Store Path | The Azure Resource ID of the specific Azure Application Gateway instance and the specific HTTPS/TLS Listener to which the certificate will be bound. Example: /subscriptions/{subscription-id}/resourceGroups/{resource-group-name}/providers/Microsoft.Network/applicationGateways/{gateway-name}/frontendHttpListeners/{listener-name} | |
 | Orchestrator | Select an approved orchestrator capable of managing `AppGwBin` certificates. Specifically, one with the `AzureAppGwBin` capability. | |
 
 * **Using kfutil**

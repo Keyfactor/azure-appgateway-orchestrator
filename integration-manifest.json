@@ -1,9 +1,9 @@
 {
-    "$schema": "/Users/hroszell/coding/dev/staff-tools/keyfactor.github.io/v2/integration-manifest-schema.json",
+    "$schema": "https://keyfactor.github.io/v2/integration-manifest-schema.json",
     "name": "Azure Application Gateway Orchestrator",
     "integration_type": "orchestrator",
     "status": "production",
-    "description": "The Azure Application Gateway Orchestrator Extension is an extension to the Keyfactor Universal Orchestrator that allows for the management of certificates on Azure Application Gateways, including the ability to add and bind certificates to HTTPS listeners.",
+    "description": "The Azure Application Gateway Universal Orchestrator extension remotely manages certificates used by Azure Application Gateways, supporting both general certificate management and HTTPS/TLS Listener binding management.",
     "support_level": "kf-supported",
     "release_dir": "AzureAppGatewayOrchestrator\\bin\\Release",
     "link_github": true,
@@ -12,30 +12,14 @@
         "orchestrator": {
             "UOFramework": "10.4",
             "pam_support": false,
-            "win": {
-                "supportsManagementAdd": true,
-                "supportsManagementRemove": true,
-                "supportsCreateStore": false,
-                "supportsDiscovery": true,
-                "supportsReenrollment": false,
-                "supportsInventory": true
-            },
-            "linux": {
-                "supportsManagementAdd": true,
-                "supportsManagementRemove": true,
-                "supportsCreateStore": false,
-                "supportsDiscovery": true,
-                "supportsReenrollment": false,
-                "supportsInventory": true
-            },
             "store_types": [
                 {
                     "Name": "Azure Application Gateway Certificate",
                     "ShortName": "AzureAppGw",
                     "Capability": "AzureAppGw",
                     "LocalStore": false,
-                    "ClientMachineDescription": "The Azure Tenant (directory) ID that owns the Service Principal.",
-                    "StorePathDescription": "Azure resource ID of the application gateway, following the format: /subscriptions/<subscription-id>/resourceGroups/<resource-group-name>/providers/Microsoft.Network/applicationGateways/<application-gateway-name>.",
+                    "ClientMachineDescription": "The fully qualified domain name (FQDN) or the IP address of the Azure Application Gateway. Example: myappgateway.example.com",
+                    "StorePathDescription": "The Azure Resource ID of the specific Azure Application Gateway instance where the certificate will be managed. Example: /subscriptions/{subscription-id}/resourceGroups/{resource-group-name}/providers/Microsoft.Network/applicationGateways/{gateway-name}",
                     "SupportedOperations": {
                         "Add": true,
                         "Remove": true,
@@ -61,8 +45,8 @@
                     "ShortName": "AppGwBin",
                     "Capability": "AzureAppGwBin",
                     "LocalStore": false,
-                    "ClientMachineDescription": "The Azure Tenant (directory) ID that owns the Service Principal.",
-                    "StorePathDescription": "Azure resource ID of the application gateway, following the format: /subscriptions/<subscription-id>/resourceGroups/<resource-group-name>/providers/Microsoft.Network/applicationGateways/<application-gateway-name>.",
+                    "ClientMachineDescription": "The fully qualified domain name (FQDN) or the IP address of the Azure Application Gateway. Example: myappgateway.example.com",
+                    "StorePathDescription": "The Azure Resource ID of the specific Azure Application Gateway instance and the specific HTTPS/TLS Listener to which the certificate will be bound. Example: /subscriptions/{subscription-id}/resourceGroups/{resource-group-name}/providers/Microsoft.Network/applicationGateways/{gateway-name}/frontendHttpListeners/{listener-name}",
                     "SupportedOperations": {
                         "Add": true,
                         "Remove": false,

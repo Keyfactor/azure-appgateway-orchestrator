@@ -1,5 +1,5 @@
 {
-    "$schema": "https://keyfactor.github.io/integration-manifest-schema.json",
+    "$schema": "/Users/hroszell/coding/dev/staff-tools/keyfactor.github.io/v2/integration-manifest-schema.json",
     "name": "Azure Application Gateway Orchestrator",
     "integration_type": "orchestrator",
     "status": "production",
@@ -43,45 +43,7 @@
                         "Discovery": true,
                         "Inventory": true
                     },
-                    "Properties": [
-                        {
-                            "Name": "ServerUsername",
-                            "DisplayName": "Server Username",
-                            "Type": "Secret",
-                            "Description": "Application ID of the service principal, representing the identity used for managing the Application Gateway.",
-                            "Required": false
-                        },
-                        {
-                            "Name": "ServerPassword",
-                            "DisplayName": "Server Password",
-                            "Type": "Secret",
-                            "Description": "A Client Secret that the extension will use to authenticate with the Azure Resource Management API for managing Application Gateway certificates, OR the password that encrypts the private key in ClientCertificate",
-                            "Required": false
-                        },
-                        {
-                            "Name": "ClientCertificate",
-                            "DisplayName": "Client Certificate",
-                            "Type": "Secret",
-                            "Description": "The client certificate used to authenticate with Azure Resource Management API for managing Application Gateway certificates. See the [requirements](#client-certificate-or-client-secret) for more information.",
-                            "Required": false
-                        },
-                        {
-                            "Name": "AzureCloud",
-                            "DisplayName": "Azure Global Cloud Authority Host",
-                            "Type": "MultipleChoice",
-                            "DefaultValue": "public,china,germany,government",
-                            "Description": "Specifies the Azure Cloud instance used by the organization.",
-                            "Required": false
-                        },
-                        {
-                            "Name": "ServerUseSsl",
-                            "DisplayName": "Use SSL",
-                            "Type": "Bool",
-                            "DefaultValue": "true",
-                            "Description": "Specifies whether SSL should be used for communication with the server. Set to 'true' to enable SSL, and 'false' to disable it.",
-                            "Required": true
-                        }
-                    ],
+                    "Properties": [],
                     "PasswordOptions": {
                         "EntrySupported": false,
                         "StoreRequired": false,
@@ -91,7 +53,8 @@
                     "ServerRequired": true,
                     "PowerShell": false,
                     "BlueprintAllowed": false,
-                    "CustomAliasAllowed": "Required"
+                    "CustomAliasAllowed": "Required",
+                    "EntryParameters": []
                 },
                 {
                     "Name": "Azure Application Gateway Certificate Binding",
@@ -107,45 +70,7 @@
                         "Discovery": true,
                         "Inventory": false
                     },
-                    "Properties": [
-                        {
-                            "Name": "ServerUsername",
-                            "DisplayName": "Server Username",
-                            "Type": "Secret",
-                            "Description": "Application ID of the service principal, representing the identity used for managing the Application Gateway.",
-                            "Required": false
-                        },
-                        {
-                            "Name": "ServerPassword",
-                            "DisplayName": "Server Password",
-                            "Type": "Secret",
-                            "Description": "A Client Secret that the extension will use to authenticate with the Azure Resource Management API for managing Application Gateway certificates, OR the password that encrypts the private key in ClientCertificate",
-                            "Required": false
-                        },
-                        {
-                            "Name": "ClientCertificate",
-                            "DisplayName": "Client Certificate",
-                            "Type": "Secret",
-                            "Description": "The client certificate used to authenticate with Azure Resource Management API for managing Application Gateway certificates. See the [requirements](#client-certificate-or-client-secret) for more information.",
-                            "Required": false
-                        },
-                        {
-                            "Name": "AzureCloud",
-                            "DisplayName": "Azure Global Cloud Authority Host",
-                            "Type": "MultipleChoice",
-                            "DefaultValue": "public,china,germany,government",
-                            "Description": "Specifies the Azure Cloud instance used by the organization.",
-                            "Required": false
-                        },
-                        {
-                            "Name": "ServerUseSsl",
-                            "DisplayName": "Use SSL",
-                            "Type": "Bool",
-                            "DefaultValue": "true",
-                            "Description": "Specifies whether SSL should be used for communication with the server. Set to 'true' to enable SSL, and 'false' to disable it.",
-                            "Required": true
-                        }
-                    ],
+                    "Properties": [],
                     "PasswordOptions": {
                         "EntrySupported": false,
                         "StoreRequired": false,
@@ -155,7 +80,8 @@
                     "ServerRequired": true,
                     "PowerShell": false,
                     "BlueprintAllowed": false,
-                    "CustomAliasAllowed": "Required"
+                    "CustomAliasAllowed": "Required",
+                    "EntryParameters": []
                 }
             ]
         }

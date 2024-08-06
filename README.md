@@ -1,53 +1,3 @@
-
-# Azure Application Gateway Orchestrator
-
-The Azure Application Gateway Orchestrator Extension is an extension to the Keyfactor Universal Orchestrator that allows for the management of certificates on Azure Application Gateways, including the ability to add and bind certificates to HTTPS listeners.
-
-#### Integration status: Production - Ready for use in production environments.
-
-## About the Keyfactor Universal Orchestrator Extension
-
-This repository contains a Universal Orchestrator Extension which is a plugin to the Keyfactor Universal Orchestrator. Within the Keyfactor Platform, Orchestrators are used to manage “certificate stores” &mdash; collections of certificates and roots of trust that are found within and used by various applications.
-
-The Universal Orchestrator is part of the Keyfactor software distribution and is available via the Keyfactor customer portal. For general instructions on installing Extensions, see the “Keyfactor Command Orchestrator Installation and Configuration Guide” section of the Keyfactor documentation. For configuration details of this specific Extension see below in this readme.
-
-The Universal Orchestrator is the successor to the Windows Orchestrator. This Orchestrator Extension plugin only works with the Universal Orchestrator and does not work with the Windows Orchestrator.
-
-## Support for Azure Application Gateway Orchestrator
-
-Azure Application Gateway Orchestrator is supported by Keyfactor for Keyfactor customers. If you have a support issue, please open a support ticket via the Keyfactor Support Portal at https://support.keyfactor.com
-
-###### To report a problem or suggest a new feature, use the **[Issues](../../issues)** tab. If you want to contribute actual bug fixes or proposed enhancements, use the **[Pull requests](../../pulls)** tab.
-
----
-
-
----
-
-
-
-## Keyfactor Version Supported
-
-The minimum version of the Keyfactor Universal Orchestrator Framework needed to run this version of the extension is 10.4
-## Platform Specific Notes
-
-The Keyfactor Universal Orchestrator may be installed on either Windows or Linux based platforms. The certificate operations supported by a capability may vary based what platform the capability is installed on. The table below indicates what capabilities are supported based on which platform the encompassing Universal Orchestrator is running.
-| Operation | Win | Linux |
-|-----|-----|------|
-|Supports Management Add|&check; |&check; |
-|Supports Management Remove|&check; |&check; |
-|Supports Create Store|  |  |
-|Supports Discovery|&check; |&check; |
-|Supports Reenrollment|  |  |
-|Supports Inventory|&check; |&check; |
-
-
-
-
-
----
-
-
 <h1 align="center" style="border-bottom: none">
     Azure Application Gateway Universal Orchestrator Extension
 </h1>
@@ -87,6 +37,14 @@ The Azure Application Gateway Orchestrator extension remotely manages certificat
 >
 > If the certificate management capabilities of Azure Key Vault are desired over direct management of certificates in Application Gateways, the Azure Key Vault orchestrator can be used in conjunction with this extension for accurate certificate location reporting via the inventory job type. This management strategy requires manual binding of certificates imported to an Application Gateway from AKV and can result in broken state in the Azure Application Gateway in the case that the secret is deleted in AKV.
 
+## Compatibility
+
+This integration is compatible with Keyfactor Universal Orchestrator version 10.4 and later.
+
+## Support
+The Azure Application Gateway Universal Orchestrator extension is supported by Keyfactor for Keyfactor customers. If you have a support issue, please open a support ticket with your Keyfactor representative. If you have a support issue, please open a support ticket via the Keyfactor Support Portal at https://support.keyfactor.com. 
+ 
+> To report a problem or suggest a new feature, use the **[Issues](../../issues)** tab. If you want to contribute actual bug fixes or proposed enhancements, use the **[Pull requests](../../pulls)** tab.
 
 ## Installation
 Before installing the Azure Application Gateway Universal Orchestrator extension, it's recommended to install [kfutil](https://github.com/Keyfactor/kfutil). Kfutil is a command-line tool that simplifies the process of creating store types, installing extensions, and instantiating certificate stores in Keyfactor Command.
@@ -101,12 +59,12 @@ The Azure Application Gateway Universal Orchestrator extension implements 2 Cert
 1. Follow the [requirements section](docs/azureappgw.md#requirements) to configure a Service Account and grant necessary API permissions.
 
     <details><summary>Requirements</summary>
-    
-    ### Azure Service Principal (Azure Resource Manager Authentication)
+
+    #### Azure Service Principal (Azure Resource Manager Authentication)
 
     The Azure Application Gateway Orchestrator extension uses an [Azure Service Principal](https://learn.microsoft.com/en-us/entra/identity-platform/app-objects-and-service-principals?tabs=browser) for authentication. Follow [Microsoft's documentation](https://learn.microsoft.com/en-us/entra/identity-platform/howto-create-service-principal-portal) to create a service principal.
 
-    #### Azure Application Gateway permissions
+    ##### Azure Application Gateway permissions
 
     For quick start and non-production environments, a Role Assignment should be created on _each resource group_ that own Application Gateways desiring management that grants the created Application/Service Principal the [Contributor (Privileged administrator) Role](https://learn.microsoft.com/en-us/azure/role-based-access-control/built-in-roles#contributor). For production environments, a custom role should be created that grants the following permissions:
 
@@ -118,13 +76,13 @@ The Azure Application Gateway Universal Orchestrator extension implements 2 Cert
 
     > Note that even if the Service Principal has permission to perform the 'Microsoft.Network/applicationGateways/write' action over the scope of the required resource group, there may be other permissions that are required by the CreateOrUpdate operation depending on the complexity of the Application Gateway's configuration. As such, the list of permissions above should not be considered as comprehensive.
 
-    #### Azure Key Vault permissions
+    ##### Azure Key Vault permissions
 
     If the managed Application Gateway is integrated with Azure Key Vault per the discussion in the [Certificates Imported to Application Gateways from Azure Key Vault](#certificates-imported-to-application-gateways-from-azure-key-vault) section, perform one of the following actions for each Key Vault with certificates imported to App Gateways:
     * **Azure role-based access control** - Create a Role Assignment that grants the Application/Service Principal the [Key Vault Secrets User](https://learn.microsoft.com/en-us/azure/key-vault/general/rbac-guide?tabs=azure-cli) built-in role.
     * **Vault access policy** - [Create an Access Policy](https://learn.microsoft.com/en-us/azure/key-vault/general/assign-access-policy?tabs=azure-portal) that grants the Application/Service Principal the Get secret permission for each Azure Key Vault.
 
-    #### Client Certificate or Client Secret
+    ##### Client Certificate or Client Secret
 
     Beginning in version 3.0.0, the Azure Application Gateway Orchestrator extension supports both [client certificate authentication](https://learn.microsoft.com/en-us/graph/auth-register-app-v2#option-1-add-a-certificate) and [client secret](https://learn.microsoft.com/en-us/graph/auth-register-app-v2#option-2-add-a-client-secret) authentication.
 
@@ -172,8 +130,6 @@ The Azure Application Gateway Universal Orchestrator extension implements 2 Cert
     > 7. Follow [Microsoft's documentation](https://learn.microsoft.com/en-us/graph/auth-register-app-v2#option-1-add-a-certificate) to add the public key certificate to the service principal used for authentication.
     >
     > You will use `clientcert.[pem|pfx].base64` as the **ClientCertificate** field in the [Certificate Store Configuration](#certificate-store-configuration) section.
-
-
 
     </details>
 
@@ -204,7 +160,10 @@ The Azure Application Gateway Universal Orchestrator extension implements 2 Cert
     * **Manually**: Follow the [official Command documentation](https://software.keyfactor.com/Core-OnPrem/Current/Content/InstallingAgents/NetCoreOrchestrator/CustomExtensions.htm?Highlight=extensions) to install the latest [Azure Application Gateway Universal Orchestrator extension](https://github.com/Keyfactor/azure-appgateway-orchestrator/releases/latest).
 
 4. Create new certificate stores in Keyfactor Command for the Sample Universal Orchestrator extension.
+
     * [Azure Application Gateway Certificate](docs/azureappgw.md#certificate-store-configuration)
+
+
 </details>
 
 <details><summary>Azure Application Gateway Certificate Binding</summary>
@@ -214,11 +173,11 @@ The Azure Application Gateway Universal Orchestrator extension implements 2 Cert
 
     <details><summary>Requirements</summary>
 
-    ### Azure Service Principal (Azure Resource Manager Authentication)
+    #### Azure Service Principal (Azure Resource Manager Authentication)
 
     The Azure Application Gateway Orchestrator extension uses an [Azure Service Principal](https://learn.microsoft.com/en-us/entra/identity-platform/app-objects-and-service-principals?tabs=browser) for authentication. Follow [Microsoft's documentation](https://learn.microsoft.com/en-us/entra/identity-platform/howto-create-service-principal-portal) to create a service principal.
 
-    #### Azure Application Gateway permissions
+    ##### Azure Application Gateway permissions
 
     For quick start and non-production environments, a Role Assignment should be created on _each resource group_ that own Application Gateways desiring management that grants the created Application/Service Principal the [Contributor (Privileged administrator) Role](https://learn.microsoft.com/en-us/azure/role-based-access-control/built-in-roles#contributor). For production environments, a custom role should be created that grants the following permissions:
 
@@ -230,13 +189,13 @@ The Azure Application Gateway Universal Orchestrator extension implements 2 Cert
 
     > Note that even if the Service Principal has permission to perform the 'Microsoft.Network/applicationGateways/write' action over the scope of the required resource group, there may be other permissions that are required by the CreateOrUpdate operation depending on the complexity of the Application Gateway's configuration. As such, the list of permissions above should not be considered as comprehensive.
 
-    #### Azure Key Vault permissions
+    ##### Azure Key Vault permissions
 
     If the managed Application Gateway is integrated with Azure Key Vault per the discussion in the [Certificates Imported to Application Gateways from Azure Key Vault](#certificates-imported-to-application-gateways-from-azure-key-vault) section, perform one of the following actions for each Key Vault with certificates imported to App Gateways:
     * **Azure role-based access control** - Create a Role Assignment that grants the Application/Service Principal the [Key Vault Secrets User](https://learn.microsoft.com/en-us/azure/key-vault/general/rbac-guide?tabs=azure-cli) built-in role.
     * **Vault access policy** - [Create an Access Policy](https://learn.microsoft.com/en-us/azure/key-vault/general/assign-access-policy?tabs=azure-portal) that grants the Application/Service Principal the Get secret permission for each Azure Key Vault.
 
-    #### Client Certificate or Client Secret
+    ##### Client Certificate or Client Secret
 
     Beginning in version 3.0.0, the Azure Application Gateway Orchestrator extension supports both [client certificate authentication](https://learn.microsoft.com/en-us/graph/auth-register-app-v2#option-1-add-a-certificate) and [client secret](https://learn.microsoft.com/en-us/graph/auth-register-app-v2#option-2-add-a-client-secret) authentication.
 
@@ -285,8 +244,6 @@ The Azure Application Gateway Universal Orchestrator extension implements 2 Cert
     >
     > You will use `clientcert.[pem|pfx].base64` as the **ClientCertificate** field in the [Certificate Store Configuration](#certificate-store-configuration) section.
 
-
-
     </details>
 
 2. Create Certificate Store Types for the Azure Application Gateway Orchestrator extension. 
@@ -316,7 +273,10 @@ The Azure Application Gateway Universal Orchestrator extension implements 2 Cert
     * **Manually**: Follow the [official Command documentation](https://software.keyfactor.com/Core-OnPrem/Current/Content/InstallingAgents/NetCoreOrchestrator/CustomExtensions.htm?Highlight=extensions) to install the latest [Azure Application Gateway Universal Orchestrator extension](https://github.com/Keyfactor/azure-appgateway-orchestrator/releases/latest).
 
 4. Create new certificate stores in Keyfactor Command for the Sample Universal Orchestrator extension.
+
     * [Azure Application Gateway Certificate Binding](docs/appgwbin.md#certificate-store-configuration)
+
+
 </details>
 
 
@@ -327,7 +287,3 @@ Apache License 2.0, see [LICENSE](LICENSE).
 ## Related Integrations
 
 See all [Keyfactor Universal Orchestrator extensions](https://github.com/orgs/Keyfactor/repositories?q=orchestrator).
-
-When creating cert store type manually, that store property names and entry parameter names are case sensitive
-
-

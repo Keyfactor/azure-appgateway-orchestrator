@@ -101,7 +101,7 @@ Beginning in version 3.0.0, the Azure Application Gateway Orchestrator extension
 
 ## Certificate Store Type Configuration
 
-The recommended method for creating the `AppGwBin` Certificate Store Type is to use [kfutil](https://github.com/Keyfactor/kfutil). After installing, use the following command to create the `` Certificate Store Type:
+The recommended method for creating the `AppGwBin` Certificate Store Type is to use [kfutil](https://github.com/Keyfactor/kfutil). After installing, use the following command to create the `AppGwBin` Certificate Store Type:
 
 ```shell
 kfutil store-types create AppGwBin

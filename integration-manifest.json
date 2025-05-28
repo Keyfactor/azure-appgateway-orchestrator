@@ -1,163 +1,148 @@
 {
-    "$schema": "https://keyfactor.github.io/v2/integration-manifest-schema.json",
-    "name": "Azure Application Gateway Orchestrator",
-    "integration_type": "orchestrator",
-    "status": "production",
-    "description": "The Azure Application Gateway Orchestrator Extension is an extension to the Keyfactor Universal Orchestrator that allows for the management of certificates on Azure Application Gateways, including the ability to add and bind certificates to HTTPS listeners.",
-    "support_level": "kf-supported",
-    "release_dir": "AzureAppGatewayOrchestrator\\bin\\Release",
-    "link_github": true,
-    "update_catalog": true,
-    "about": {
-        "orchestrator": {
-            "UOFramework": "10.4",
-            "pam_support": false,
-            "win": {
-                "supportsManagementAdd": true,
-                "supportsManagementRemove": true,
-                "supportsCreateStore": false,
-                "supportsDiscovery": true,
-                "supportsReenrollment": false,
-                "supportsInventory": true
+  "$schema": "https://keyfactor.github.io/v2/integration-manifest-schema.json",
+  "name": "Azure Application Gateway Orchestrator",
+  "integration_type": "orchestrator",
+  "status": "production",
+  "description": "The Azure Application Gateway Orchestrator Extension is an extension to the Keyfactor Universal Orchestrator that allows for the management of certificates on Azure Application Gateways, including the ability to add and bind certificates to HTTPS listeners.",
+  "support_level": "kf-supported",
+  "release_dir": "AzureAppGatewayOrchestrator\\bin\\Release",
+  "release_project": "AzureAppGatewayOrchestrator/AzureAppGatewayOrchestrator.csproj",
+  "link_github": true,
+  "update_catalog": true,
+  "about": {
+    "orchestrator": {
+      "UOFramework": "10.4",
+      "pam_support": false,
+      "store_types": [
+        {
+          "Name": "Azure Application Gateway Certificate",
+          "ShortName": "AzureAppGw",
+          "Capability": "AzureAppGw",
+          "LocalStore": false,
+          "ClientMachineDescription": "The Azure Tenant (directory) ID that owns the Service Principal.",
+          "StorePathDescription": "Azure resource ID of the application gateway, following the format: /subscriptions/<subscription-id>/resourceGroups/<resource-group-name>/providers/Microsoft.Network/applicationGateways/<application-gateway-name>.",
+          "SupportedOperations": {
+            "Add": true,
+            "Remove": true,
+            "Enrollment": false,
+            "Discovery": true,
+            "Inventory": true
+          },
+          "Properties": [
+            {
+              "Name": "ServerUsername",
+              "DisplayName": "Server Username",
+              "Type": "Secret",
+              "Description": "Application ID of the service principal, representing the identity used for managing the Application Gateway.",
+              "Required": false
             },
-            "linux": {
-                "supportsManagementAdd": true,
-                "supportsManagementRemove": true,
-                "supportsCreateStore": false,
-                "supportsDiscovery": true,
-                "supportsReenrollment": false,
-                "supportsInventory": true
+            {
+              "Name": "ServerPassword",
+              "DisplayName": "Server Password",
+              "Type": "Secret",
+              "Description": "A Client Secret that the extension will use to authenticate with the Azure Resource Management API for managing Application Gateway certificates, OR the password that encrypts the private key in ClientCertificate",
+              "Required": false
             },
-            "store_types": [
-                {
-                    "Name": "Azure Application Gateway Certificate",
-                    "ShortName": "AzureAppGw",
-                    "Capability": "AzureAppGw",
-                    "LocalStore": false,
-                    "ClientMachineDescription": "The Azure Tenant (directory) ID that owns the Service Principal.",
-                    "StorePathDescription": "Azure resource ID of the application gateway, following the format: /subscriptions/<subscription-id>/resourceGroups/<resource-group-name>/providers/Microsoft.Network/applicationGateways/<application-gateway-name>.",
-                    "SupportedOperations": {
-                        "Add": true,
-                        "Remove": true,
-                        "Enrollment": false,
-                        "Discovery": true,
-                        "Inventory": true
-                    },
-                    "Properties": [
-                        {
-                            "Name": "ServerUsername",
-                            "DisplayName": "Server Username",
-                            "Type": "Secret",
-                            "Description": "Application ID of the service principal, representing the identity used for managing the Application Gateway.",
-                            "Required": false
-                        },
-                        {
-                            "Name": "ServerPassword",
-                            "DisplayName": "Server Password",
-                            "Type": "Secret",
-                            "Description": "A Client Secret that the extension will use to authenticate with the Azure Resource Management API for managing Application Gateway certificates, OR the password that encrypts the private key in ClientCertificate",
-                            "Required": false
-                        },
-                        {
-                            "Name": "ClientCertificate",
-                            "DisplayName": "Client Certificate",
-                            "Type": "Secret",
-                            "Description": "The client certificate used to authenticate with Azure Resource Management API for managing Application Gateway certificates. See the [requirements](#client-certificate-or-client-secret) for more information.",
-                            "Required": false
-                        },
-                        {
-                            "Name": "AzureCloud",
-                            "DisplayName": "Azure Global Cloud Authority Host",
-                            "Type": "MultipleChoice",
-                            "DefaultValue": "public,china,germany,government",
-                            "Description": "Specifies the Azure Cloud instance used by the organization.",
-                            "Required": false
-                        },
-                        {
-                            "Name": "ServerUseSsl",
-                            "DisplayName": "Use SSL",
-                            "Type": "Bool",
-                            "DefaultValue": "true",
-                            "Description": "Specifies whether SSL should be used for communication with the server. Set to 'true' to enable SSL, and 'false' to disable it.",
-                            "Required": true
-                        }
-                    ],
-                    "PasswordOptions": {
-                        "EntrySupported": false,
-                        "StoreRequired": false,
-                        "Style": "Default"
-                    },
-                    "PrivateKeyAllowed": "Required",
-                    "ServerRequired": true,
-                    "PowerShell": false,
-                    "BlueprintAllowed": false,
-                    "CustomAliasAllowed": "Required"
-                },
-                {
-                    "Name": "Azure Application Gateway Certificate Binding",
-                    "ShortName": "AppGwBin",
-                    "Capability": "AzureAppGwBin",
-                    "LocalStore": false,
-                    "ClientMachineDescription": "The Azure Tenant (directory) ID that owns the Service Principal.",
-                    "StorePathDescription": "Azure resource ID of the application gateway, following the format: /subscriptions/<subscription-id>/resourceGroups/<resource-group-name>/providers/Microsoft.Network/applicationGateways/<application-gateway-name>.",
-                    "SupportedOperations": {
-                        "Add": true,
-                        "Remove": false,
-                        "Enrollment": false,
-                        "Discovery": true,
-                        "Inventory": false
-                    },
-                    "Properties": [
-                        {
-                            "Name": "ServerUsername",
-                            "DisplayName": "Server Username",
-                            "Type": "Secret",
-                            "Description": "Application ID of the service principal, representing the identity used for managing the Application Gateway.",
-                            "Required": false
-                        },
-                        {
-                            "Name": "ServerPassword",
-                            "DisplayName": "Server Password",
-                            "Type": "Secret",
-                            "Description": "A Client Secret that the extension will use to authenticate with the Azure Resource Management API for managing Application Gateway certificates, OR the password that encrypts the private key in ClientCertificate",
-                            "Required": false
-                        },
-                        {
-                            "Name": "ClientCertificate",
-                            "DisplayName": "Client Certificate",
-                            "Type": "Secret",
-                            "Description": "The client certificate used to authenticate with Azure Resource Management API for managing Application Gateway certificates. See the [requirements](#client-certificate-or-client-secret) for more information.",
-                            "Required": false
-                        },
-                        {
-                            "Name": "AzureCloud",
-                            "DisplayName": "Azure Global Cloud Authority Host",
-                            "Type": "MultipleChoice",
-                            "DefaultValue": "public,china,germany,government",
-                            "Description": "Specifies the Azure Cloud instance used by the organization.",
-                            "Required": false
-                        },
-                        {
-                            "Name": "ServerUseSsl",
-                            "DisplayName": "Use SSL",
-                            "Type": "Bool",
-                            "DefaultValue": "true",
-                            "Description": "Specifies whether SSL should be used for communication with the server. Set to 'true' to enable SSL, and 'false' to disable it.",
-                            "Required": true
-                        }
-                    ],
-                    "PasswordOptions": {
-                        "EntrySupported": false,
-                        "StoreRequired": false,
-                        "Style": "Default"
-                    },
-                    "PrivateKeyAllowed": "Required",
-                    "ServerRequired": true,
-                    "PowerShell": false,
-                    "BlueprintAllowed": false,
-                    "CustomAliasAllowed": "Required"
-                }
-            ]
+            {
+              "Name": "ClientCertificate",
+              "DisplayName": "Client Certificate",
+              "Type": "Secret",
+              "Description": "The client certificate used to authenticate with Azure Resource Management API for managing Application Gateway certificates. See the [requirements](#client-certificate-or-client-secret) for more information.",
+              "Required": false
+            },
+            {
+              "Name": "AzureCloud",
+              "DisplayName": "Azure Global Cloud Authority Host",
+              "Type": "MultipleChoice",
+              "DefaultValue": "public,china,germany,government",
+              "Description": "Specifies the Azure Cloud instance used by the organization.",
+              "Required": false
+            },
+            {
+              "Name": "ServerUseSsl",
+              "DisplayName": "Use SSL",
+              "Type": "Bool",
+              "DefaultValue": "true",
+              "Description": "Specifies whether SSL should be used for communication with the server. Set to 'true' to enable SSL, and 'false' to disable it.",
+              "Required": true
+            }
+          ],
+          "PasswordOptions": {
+            "EntrySupported": false,
+            "StoreRequired": false,
+            "Style": "Default"
+          },
+          "PrivateKeyAllowed": "Required",
+          "ServerRequired": true,
+          "PowerShell": false,
+          "BlueprintAllowed": false,
+          "CustomAliasAllowed": "Required"
+        },
+        {
+          "Name": "Azure Application Gateway Certificate Binding",
+          "ShortName": "AppGwBin",
+          "Capability": "AzureAppGwBin",
+          "LocalStore": false,
+          "ClientMachineDescription": "The Azure Tenant (directory) ID that owns the Service Principal.",
+          "StorePathDescription": "Azure resource ID of the application gateway, following the format: /subscriptions/<subscription-id>/resourceGroups/<resource-group-name>/providers/Microsoft.Network/applicationGateways/<application-gateway-name>.",
+          "SupportedOperations": {
+            "Add": true,
+            "Remove": false,
+            "Enrollment": false,
+            "Discovery": true,
+            "Inventory": false
+          },
+          "Properties": [
+            {
+              "Name": "ServerUsername",
+              "DisplayName": "Server Username",
+              "Type": "Secret",
+              "Description": "Application ID of the service principal, representing the identity used for managing the Application Gateway.",
+              "Required": false
+            },
+            {
+              "Name": "ServerPassword",
+              "DisplayName": "Server Password",
+              "Type": "Secret",
+              "Description": "A Client Secret that the extension will use to authenticate with the Azure Resource Management API for managing Application Gateway certificates, OR the password that encrypts the private key in ClientCertificate",
+              "Required": false
+            },
+            {
+              "Name": "ClientCertificate",
+              "DisplayName": "Client Certificate",
+              "Type": "Secret",
+              "Description": "The client certificate used to authenticate with Azure Resource Management API for managing Application Gateway certificates. See the [requirements](#client-certificate-or-client-secret) for more information.",
+              "Required": false
+            },
+            {
+              "Name": "AzureCloud",
+              "DisplayName": "Azure Global Cloud Authority Host",
+              "Type": "MultipleChoice",
+              "DefaultValue": "public,china,germany,government",
+              "Description": "Specifies the Azure Cloud instance used by the organization.",
+              "Required": false
+            },
+            {
+              "Name": "ServerUseSsl",
+              "DisplayName": "Use SSL",
+              "Type": "Bool",
+              "DefaultValue": "true",
+              "Description": "Specifies whether SSL should be used for communication with the server. Set to 'true' to enable SSL, and 'false' to disable it.",
+              "Required": true
+            }
+          ],
+          "PasswordOptions": {
+            "EntrySupported": false,
+            "StoreRequired": false,
+            "Style": "Default"
+          },
+          "PrivateKeyAllowed": "Required",
+          "ServerRequired": true,
+          "PowerShell": false,
+          "BlueprintAllowed": false,
+          "CustomAliasAllowed": "Required"
         }
+      ]
     }
+  }
 }

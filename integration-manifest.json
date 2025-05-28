@@ -13,22 +13,6 @@
     "orchestrator": {
       "UOFramework": "10.4",
       "pam_support": false,
-      "win": {
-        "supportsManagementAdd": true,
-        "supportsManagementRemove": true,
-        "supportsCreateStore": false,
-        "supportsDiscovery": true,
-        "supportsReenrollment": false,
-        "supportsInventory": true
-      },
-      "linux": {
-        "supportsManagementAdd": true,
-        "supportsManagementRemove": true,
-        "supportsCreateStore": false,
-        "supportsDiscovery": true,
-        "supportsReenrollment": false,
-        "supportsInventory": true
-      },
       "store_types": [
         {
           "Name": "Azure Application Gateway Certificate",

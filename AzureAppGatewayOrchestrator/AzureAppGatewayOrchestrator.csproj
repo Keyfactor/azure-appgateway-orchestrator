@@ -3,6 +3,8 @@
   <PropertyGroup>
     <AppendTargetFrameworkToOutputPath>true</AppendTargetFrameworkToOutputPath>
     <TargetFrameworks>net6.0;net8.0</TargetFrameworks>
+    <RootNamespace>AzureApplicationGatewayOrchestratorExtension</RootNamespace>
+    <AssemblyName>AzureApplicationGatewayOrchestratorExtension</AssemblyName>
     <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
     <ImplicitUsings>disable</ImplicitUsings>
   </PropertyGroup>

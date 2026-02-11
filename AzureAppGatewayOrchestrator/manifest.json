@@ -2,27 +2,27 @@
   "extensions": {
     "Keyfactor.Orchestrators.Extensions.IOrchestratorJobExtension": {
       "CertStores.AzureAppGw.Inventory": {
-        "assemblypath": "AzureApplicationGatewayOrchestratorExtension.dll",
+        "assemblypath": "AzureAppGatewayOrchestrator.dll",
         "TypeFullName": "AzureApplicationGatewayOrchestratorExtension.AppGatewayCertificateJobs.Inventory"
       },
       "CertStores.AzureAppGw.Management": {
-        "assemblypath": "AzureApplicationGatewayOrchestratorExtension.dll",
+        "assemblypath": "AzureAppGatewayOrchestrator.dll",
         "TypeFullName": "AzureApplicationGatewayOrchestratorExtension.AppGatewayCertificateJobs.Management"
       },
       "CertStores.AzureAppGw.Discovery": {
-        "assemblypath": "AzureApplicationGatewayOrchestratorExtension.dll",
+        "assemblypath": "AzureAppGatewayOrchestrator.dll",
         "TypeFullName": "AzureApplicationGatewayOrchestratorExtension.AppGatewayCertificateJobs.Discovery"
       },
       "CertStores.AzureAppGwBin.Inventory": {
-        "assemblypath": "AzureApplicationGatewayOrchestratorExtension.dll",
+        "assemblypath": "AzureAppGatewayOrchestrator.dll",
         "TypeFullName": "AzureApplicationGatewayOrchestratorExtension.ListenerBindingJobs.Inventory"
       },
       "CertStores.AzureAppGwBin.Management": {
-        "assemblypath": "AzureApplicationGatewayOrchestratorExtension.dll",
+        "assemblypath": "AzureAppGatewayOrchestrator.dll",
         "TypeFullName": "AzureApplicationGatewayOrchestratorExtension.ListenerBindingJobs.Management"
       },
       "CertStores.AzureAppGwBin.Discovery": {
-        "assemblypath": "AzureApplicationGatewayOrchestratorExtension.dll",
+        "assemblypath": "AzureAppGatewayOrchestrator.dll",
         "TypeFullName": "AzureApplicationGatewayOrchestratorExtension.ListenerBindingJobs.Discovery"
       }
     }

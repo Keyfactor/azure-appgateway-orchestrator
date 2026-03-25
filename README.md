@@ -49,9 +49,9 @@ The Azure Application Gateway Universal Orchestrator extension implements 2 Cert
 This integration is compatible with Keyfactor Universal Orchestrator version 10.4 and later.
 
 ## Support
-The Azure Application Gateway Universal Orchestrator extension If you have a support issue, please open a support ticket by either contacting your Keyfactor representative or via the Keyfactor Support Portal at https://support.keyfactor.com.
+The Azure Application Gateway Universal Orchestrator extension is supported by Keyfactor. If you require support for any issues or have feature request, please open a support ticket by either contacting your Keyfactor representative or via the Keyfactor Support Portal at https://support.keyfactor.com.
 
-> To report a problem or suggest a new feature, use the **[Issues](../../issues)** tab. If you want to contribute actual bug fixes or proposed enhancements, use the **[Pull requests](../../pulls)** tab.
+> If you want to contribute bug fixes or additional enhancements, use the **[Pull requests](../../pulls)** tab.
 
 ## Requirements & Prerequisites
 
@@ -294,6 +294,53 @@ the Keyfactor Command Portal
 
    ![AzureAppGw Custom Fields Tab](docsource/images/AzureAppGw-custom-fields-store-type-dialog.png)
 
+
+   ###### Server Username
+   Application ID of the service principal, representing the identity used for managing the Application Gateway.
+
+
+   > [!IMPORTANT]
+   > This field is created by the `Needs Server` on the Basic tab, do not create this field manually.
+
+
+
+
+   ###### Server Password
+   A Client Secret that the extension will use to authenticate with the Azure Resource Management API for managing Application Gateway certificates, OR the password that encrypts the private key in ClientCertificate
+
+
+   > [!IMPORTANT]
+   > This field is created by the `Needs Server` on the Basic tab, do not create this field manually.
+
+
+
+
+   ###### Client Certificate
+   The client certificate used to authenticate with Azure Resource Management API for managing Application Gateway certificates. See the [requirements](#client-certificate-or-client-secret) for more information.
+
+   ![AzureAppGw Custom Field - ClientCertificate](docsource/images/AzureAppGw-custom-field-ClientCertificate-dialog.png)
+   ![AzureAppGw Custom Field - ClientCertificate](docsource/images/AzureAppGw-custom-field-ClientCertificate-validation-options-dialog.png)
+
+
+
+   ###### Azure Global Cloud Authority Host
+   Specifies the Azure Cloud instance used by the organization.
+
+   ![AzureAppGw Custom Field - AzureCloud](docsource/images/AzureAppGw-custom-field-AzureCloud-dialog.png)
+   ![AzureAppGw Custom Field - AzureCloud](docsource/images/AzureAppGw-custom-field-AzureCloud-validation-options-dialog.png)
+
+
+
+   ###### Use SSL
+   Specifies whether SSL should be used for communication with the server. Set to 'true' to enable SSL, and 'false' to disable it.
+
+   ![AzureAppGw Custom Field - ServerUseSsl](docsource/images/AzureAppGw-custom-field-ServerUseSsl-dialog.png)
+   ![AzureAppGw Custom Field - ServerUseSsl](docsource/images/AzureAppGw-custom-field-ServerUseSsl-validation-options-dialog.png)
+
+
+
+
+
    </details>
 </details>
 
@@ -457,6 +504,53 @@ the Keyfactor Command Portal
 
    ![AppGwBin Custom Fields Tab](docsource/images/AppGwBin-custom-fields-store-type-dialog.png)
 
+
+   ###### Server Username
+   Application ID of the service principal, representing the identity used for managing the Application Gateway.
+
+
+   > [!IMPORTANT]
+   > This field is created by the `Needs Server` on the Basic tab, do not create this field manually.
+
+
+
+
+   ###### Server Password
+   A Client Secret that the extension will use to authenticate with the Azure Resource Management API for managing Application Gateway certificates, OR the password that encrypts the private key in ClientCertificate
+
+
+   > [!IMPORTANT]
+   > This field is created by the `Needs Server` on the Basic tab, do not create this field manually.
+
+
+
+
+   ###### Client Certificate
+   The client certificate used to authenticate with Azure Resource Management API for managing Application Gateway certificates. See the [requirements](#client-certificate-or-client-secret) for more information.
+
+   ![AppGwBin Custom Field - ClientCertificate](docsource/images/AppGwBin-custom-field-ClientCertificate-dialog.png)
+   ![AppGwBin Custom Field - ClientCertificate](docsource/images/AppGwBin-custom-field-ClientCertificate-validation-options-dialog.png)
+
+
+
+   ###### Azure Global Cloud Authority Host
+   Specifies the Azure Cloud instance used by the organization.
+
+   ![AppGwBin Custom Field - AzureCloud](docsource/images/AppGwBin-custom-field-AzureCloud-dialog.png)
+   ![AppGwBin Custom Field - AzureCloud](docsource/images/AppGwBin-custom-field-AzureCloud-validation-options-dialog.png)
+
+
+
+   ###### Use SSL
+   Specifies whether SSL should be used for communication with the server. Set to 'true' to enable SSL, and 'false' to disable it.
+
+   ![AppGwBin Custom Field - ServerUseSsl](docsource/images/AppGwBin-custom-field-ServerUseSsl-dialog.png)
+   ![AppGwBin Custom Field - ServerUseSsl](docsource/images/AppGwBin-custom-field-ServerUseSsl-validation-options-dialog.png)
+
+
+
+
+
    </details>
 </details>
 
@@ -465,15 +559,14 @@ the Keyfactor Command Portal
 
 1. **Download the latest Azure Application Gateway Universal Orchestrator extension from GitHub.**
 
-    Navigate to the [Azure Application Gateway Universal Orchestrator extension GitHub version page](https://github.com/Keyfactor/azure-appgateway-orchestrator/releases/latest). Refer to the compatibility matrix below to determine whether the `net6.0` or `net8.0` asset should be downloaded. Then, click the corresponding asset to download the zip archive.
+    Navigate to the [Azure Application Gateway Universal Orchestrator extension GitHub version page](https://github.com/Keyfactor/azure-appgateway-orchestrator/releases/latest). Refer to the compatibility matrix below to determine the asset should be downloaded. Then, click the corresponding asset to download the zip archive.
 
    | Universal Orchestrator Version | Latest .NET version installed on the Universal Orchestrator server | `rollForward` condition in `Orchestrator.runtimeconfig.json` | `azure-appgateway-orchestrator` .NET version to download |
    | --------- | ----------- | ----------- | ----------- |
    | Older than `11.0.0` | | | `net6.0` |
    | Between `11.0.0` and `11.5.1` (inclusive) | `net6.0` | | `net6.0` |
-   | Between `11.0.0` and `11.5.1` (inclusive) | `net8.0` | `Disable` | `net6.0` |
-   | Between `11.0.0` and `11.5.1` (inclusive) | `net8.0` | `LatestMajor` | `net8.0` |
-   | `11.6` _and_ newer | `net8.0` | | `net8.0` |
+   | Between `11.0.0` and `11.5.1` (inclusive) | `net8.0` | `Disable` | `net6.0` || Between `11.0.0` and `11.5.1` (inclusive) | `net8.0` | `LatestMajor` | `net8.0` |
+   | `11.6` _and_ newer | `net8.0` | | `net8.0` | 
 
     Unzip the archive containing extension assemblies to a known location.
 
@@ -528,8 +621,8 @@ The Azure Application Gateway Universal Orchestrator extension implements 2 Cert
 
     Click the Add button to add a new Certificate Store. Use the table below to populate the **Attributes** in the **Add** form.
 
-   | Attribute | Description |
-   | --------- | ----------- |
+   | Attribute | Description                                             |
+   | --------- |---------------------------------------------------------|
    | Category | Select "Azure Application Gateway Certificate" or the customized certificate store name from the previous step. |
    | Container | Optional container to associate certificate store with. |
    | Client Machine | The Azure Tenant (directory) ID that owns the Service Principal. |
@@ -619,8 +712,8 @@ Please refer to the **Universal Orchestrator (remote)** usage section ([PAM prov
 
     Click the Add button to add a new Certificate Store. Use the table below to populate the **Attributes** in the **Add** form.
 
-   | Attribute | Description |
-   | --------- | ----------- |
+   | Attribute | Description                                             |
+   | --------- |---------------------------------------------------------|
    | Category | Select "Azure Application Gateway Certificate Binding" or the customized certificate store name from the previous step. |
    | Container | Optional container to associate certificate store with. |
    | Client Machine | The Azure Tenant (directory) ID that owns the Service Principal. |

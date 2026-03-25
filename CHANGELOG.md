@@ -1,3 +1,8 @@
+# 3.4.0
+
+- Renamed the extension's dll in the manifest.json so the UO would recognize and register the extension.
+- Updated the Azure.Identity NuGet package to 1.17.1 to resolve a security vulnerability.
+
 # 3.3.0
 
 - feat: Add .net6/8 dual build
@@ -46,4 +51,3 @@
 # 1.1.0
 
 - First production release
-

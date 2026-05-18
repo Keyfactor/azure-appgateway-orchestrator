@@ -18,6 +18,7 @@ using AzureApplicationGatewayOrchestratorExtension.Client;
 using Keyfactor.Logging;
 using Keyfactor.Orchestrators.Common.Enums;
 using Keyfactor.Orchestrators.Extensions;
+using Keyfactor.Orchestrators.Extensions.Interfaces;
 using Microsoft.Extensions.Logging;
 
 namespace AzureApplicationGatewayOrchestratorExtension.AppGatewayCertificateJobs;
@@ -30,6 +31,13 @@ public class Discovery : IDiscoveryJobExtension
     private bool _clientInitializedByInjection = false;
 
     ILogger _logger = LogHandler.GetClassLogger<Discovery>();
+
+    public IPAMSecretResolver _resolver;
+
+    public Discovery(IPAMSecretResolver resolver)
+    {
+        _resolver = resolver;
+    }
 
     public JobResult ProcessJob(DiscoveryJobConfiguration config, SubmitDiscoveryUpdate callback)
     {
@@ -49,11 +57,14 @@ public class Discovery : IDiscoveryJobExtension
         {
             _logger.LogTrace($"Processing tenantId: {tenantId}");
 
-            // If the client was not injected, create a new one with the tenant ID determied by
+            // If the client was not injected, create a new one with the tenant ID determined by
             // the TenantIdsToSearchFromJobConfig method
             if (!_clientInitializedByInjection)
             {
-                Client = new AppGatewayJobClientBuilder<GatewayClient.Builder>()
+                var clientBuilder = new AppGatewayJobClientBuilder<GatewayClient.Builder>();
+                clientBuilder.resolver = _resolver;
+
+                Client = clientBuilder
                     .WithDiscoveryJobConfiguration(config, tenantId)
                     .Build();
             }

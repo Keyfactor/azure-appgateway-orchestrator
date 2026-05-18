@@ -19,6 +19,7 @@ using AzureApplicationGatewayOrchestratorExtension.Client;
 using Keyfactor.Logging;
 using Keyfactor.Orchestrators.Common.Enums;
 using Keyfactor.Orchestrators.Extensions;
+using Keyfactor.Orchestrators.Extensions.Interfaces;
 using Microsoft.Extensions.Logging;
 
 namespace AzureApplicationGatewayOrchestratorExtension.AppGatewayCertificateJobs;
@@ -30,13 +31,23 @@ public class Inventory : IInventoryJobExtension
 
     ILogger _logger = LogHandler.GetClassLogger<Inventory>();
 
+    public IPAMSecretResolver _resolver;
+
+    public Inventory(IPAMSecretResolver resolver)
+    {
+            _resolver = resolver;
+    }
+
     public JobResult ProcessJob(InventoryJobConfiguration config, SubmitInventoryUpdate cb) 
     {
         _logger.LogDebug($"Beginning App Gateway Inventory Job");
 
         if (Client == null)
         {
-            Client = new AppGatewayJobClientBuilder<GatewayClient.Builder>()
+            var clientBuilder = new AppGatewayJobClientBuilder<GatewayClient.Builder>();
+            clientBuilder.resolver = _resolver;
+
+            Client = clientBuilder
                 .WithCertificateStoreDetails(config.CertificateStoreDetails)
                 .Build();
         }

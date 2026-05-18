@@ -16,9 +16,11 @@ using System;
 using System.Security.Cryptography;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
+using AzureAppGatewayOrchestrator;
 using AzureApplicationGatewayOrchestratorExtension.Client;
 using Keyfactor.Logging;
 using Keyfactor.Orchestrators.Extensions;
+using Keyfactor.Orchestrators.Extensions.Interfaces;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 
@@ -28,6 +30,7 @@ public class AppGatewayJobClientBuilder<TBuilder> where TBuilder : IAzureAppGate
 {
     public TBuilder _builder = new TBuilder();
     private ILogger _logger = LogHandler.GetClassLogger<AppGatewayJobClientBuilder<TBuilder>>();
+    public IPAMSecretResolver resolver;
 
     public class CertificateStoreProperties
     {
@@ -43,29 +46,32 @@ public class AppGatewayJobClientBuilder<TBuilder> where TBuilder : IAzureAppGate
 
         CertificateStoreProperties properties = JsonConvert.DeserializeObject<CertificateStoreProperties>(details.Properties);
 
+        string serverUserName = PAMUtilities.ResolvePAMField(_logger, resolver, "Server UserName", properties.ServerUsername);
+        string serverPassword = PAMUtilities.ResolvePAMField(_logger, resolver, "Server Password", properties.ServerPassword);
+
         _logger.LogTrace($"Builder - ClientMachine  => TenantId:       {details.ClientMachine}");
         _logger.LogTrace($"Builder - StorePath      => ResourceId:     {details.StorePath}");
-        _logger.LogTrace($"Builder - ServerUsername => ApplicationId:  {properties.ServerUsername}");
-        _logger.LogTrace($"Builder - ServerPassword => ClientSecret:   {properties.ServerPassword}");
+        _logger.LogTrace($"Builder - ServerUsername => ApplicationId:  {serverUserName}");
+        _logger.LogTrace($"Builder - ServerPassword => ClientSecret:   {"********"}");
         _logger.LogTrace($"Builder - AzureCloud     => AzureCloud:     {properties.AzureCloud}");
 
         _builder
             .WithTenantId(details.ClientMachine)
-            .WithApplicationId(properties.ServerUsername)
+            .WithApplicationId(serverUserName)
             .WithResourceId(details.StorePath)
             .WithAzureCloud(properties.AzureCloud);
 
         if (string.IsNullOrWhiteSpace(properties.ClientCertificate))
         {
-            _logger.LogTrace($"Builder - ServerPassword => ClientSecret:        {properties.ServerPassword}");
+            _logger.LogTrace($"Builder - ServerPassword => ClientSecret:        {"********"}");
             _logger.LogDebug("Client certificate not present - Using Client Secret authentication");
-            _builder.WithClientSecret(properties.ServerPassword);
+            _builder.WithClientSecret(serverPassword);
         }
         else
         {
-            _logger.LogTrace($"Builder - ServerPassword => ClientCertificateKeyPassword:        {properties.ServerPassword}");
+            _logger.LogTrace($"Builder - ServerPassword => ClientCertificateKeyPassword:        {"********"}");
             _logger.LogDebug("Client certificate present - Using Client Certificate authentication");
-            X509Certificate2 clientCert = SerializeClientCertificate(properties.ClientCertificate, properties.ServerPassword);
+            X509Certificate2 clientCert = SerializeClientCertificate(properties.ClientCertificate, serverPassword);
             _builder.WithClientCertificate(clientCert);
         }
 
@@ -76,12 +82,15 @@ public class AppGatewayJobClientBuilder<TBuilder> where TBuilder : IAzureAppGate
     {
         _logger.LogTrace($"Builder - tenantId => TenantId: {tenantId}");
         _logger.LogTrace($"Builder - ServerUsername => ApplicationId: {config.ServerUsername}");
-        _logger.LogTrace($"Builder - ServerPassword => ClientSecret: {config.ServerPassword}");
+        _logger.LogTrace($"Builder - ServerPassword => ClientSecret: {"********"}");
+
+        string serverUserName = PAMUtilities.ResolvePAMField(_logger, resolver, "Server UserName", config.ServerUsername);
+        string serverPassword = PAMUtilities.ResolvePAMField(_logger, resolver, "Server Password", config.ServerPassword);
 
         _builder
             .WithTenantId(tenantId)
-            .WithApplicationId(config.ServerUsername)
-            .WithClientSecret(config.ServerPassword);
+            .WithApplicationId(serverUserName)
+            .WithClientSecret(serverPassword);
 
         return this;
     }

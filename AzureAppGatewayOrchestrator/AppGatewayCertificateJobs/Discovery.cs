@@ -39,6 +39,11 @@ public class Discovery : IDiscoveryJobExtension
         _resolver = resolver;
     }
 
+    public Discovery()
+    {
+        
+    }
+
     public JobResult ProcessJob(DiscoveryJobConfiguration config, SubmitDiscoveryUpdate callback)
     {
         if (Client != null) _clientInitializedByInjection = true;

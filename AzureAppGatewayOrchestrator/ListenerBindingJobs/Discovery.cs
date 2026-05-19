@@ -15,6 +15,7 @@
 using AzureApplicationGatewayOrchestratorExtension.Client;
 using Keyfactor.Logging;
 using Keyfactor.Orchestrators.Extensions;
+using Keyfactor.Orchestrators.Extensions.Interfaces;
 using Microsoft.Extensions.Logging;
 
 namespace AzureApplicationGatewayOrchestratorExtension.ListenerBindingJobs;
@@ -25,6 +26,12 @@ public class Discovery : IDiscoveryJobExtension
     public IAzureAppGatewayClient Client { get; set; }
 
     ILogger _logger = LogHandler.GetClassLogger<Discovery>();
+
+    public IPAMSecretResolver _resolver;
+    public Discovery(IPAMSecretResolver resolver)
+    {
+        _resolver = resolver;
+    }
 
     public JobResult ProcessJob(DiscoveryJobConfiguration config, SubmitDiscoveryUpdate callback)
     {

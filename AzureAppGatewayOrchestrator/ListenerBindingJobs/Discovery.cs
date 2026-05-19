@@ -27,12 +27,6 @@ public class Discovery : IDiscoveryJobExtension
 
     ILogger _logger = LogHandler.GetClassLogger<Discovery>();
 
-    public IPAMSecretResolver _resolver;
-    public Discovery(IPAMSecretResolver resolver)
-    {
-        _resolver = resolver;
-    }
-
     public JobResult ProcessJob(DiscoveryJobConfiguration config, SubmitDiscoveryUpdate callback)
     {
         _logger.LogDebug("Beginning App Gateway Listener Binding Discovery Job - using AppGatewayCertificateJobs.Discovery.ProcessJob()");

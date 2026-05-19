@@ -15,6 +15,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Azure.ResourceManager.Network.Models;
 using AzureApplicationGatewayOrchestratorExtension.Client;
 using Keyfactor.Logging;
 using Keyfactor.Orchestrators.Common.Enums;
@@ -36,6 +37,11 @@ public class Inventory : IInventoryJobExtension
     public Inventory(IPAMSecretResolver resolver)
     {
             _resolver = resolver;
+    }
+
+    public Inventory()
+    {
+            
     }
 
     public JobResult ProcessJob(InventoryJobConfiguration config, SubmitInventoryUpdate cb) 

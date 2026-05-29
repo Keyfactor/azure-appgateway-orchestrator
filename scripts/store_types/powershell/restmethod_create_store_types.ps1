@@ -89,7 +89,7 @@ New-StoreType "AzureAppGw" @'
       "Name": "AzureCloud",
       "DisplayName": "Azure Global Cloud Authority Host",
       "Type": "MultipleChoice",
-      "DefaultValue": "public,china,germany,government",
+      "DefaultValue": "public,china,government",
       "Required": false
     },
     {
@@ -141,7 +141,7 @@ New-StoreType "AppGwBin" @'
       "Name": "AzureCloud",
       "DisplayName": "Azure Global Cloud Authority Host",
       "Type": "MultipleChoice",
-      "DefaultValue": "public,china,germany,government",
+      "DefaultValue": "public,china,government",
       "Required": false
     },
     {

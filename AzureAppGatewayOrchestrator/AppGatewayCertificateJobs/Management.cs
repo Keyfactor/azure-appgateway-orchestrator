@@ -17,6 +17,7 @@ using AzureApplicationGatewayOrchestratorExtension.Client;
 using Keyfactor.Logging;
 using Keyfactor.Orchestrators.Common.Enums;
 using Keyfactor.Orchestrators.Extensions;
+using Keyfactor.Orchestrators.Extensions.Interfaces;
 using Microsoft.Extensions.Logging;
 
 namespace AzureApplicationGatewayOrchestratorExtension.AppGatewayCertificateJobs;
@@ -28,13 +29,27 @@ public class Management : IManagementJobExtension
 
     ILogger _logger = LogHandler.GetClassLogger<Management>();
 
+    public IPAMSecretResolver _resolver;
+
+    public Management(IPAMSecretResolver resolver)
+    {
+        _resolver = resolver;
+    }
+
+    public Management()
+    {
+    }
+
     public JobResult ProcessJob(ManagementJobConfiguration config)
     {
         _logger.LogDebug("Beginning App Gateway Management Job");
 
         if (Client == null)
         {
-            Client = new AppGatewayJobClientBuilder<GatewayClient.Builder>()
+            var clientBuilder = new AppGatewayJobClientBuilder<GatewayClient.Builder>();
+            clientBuilder.resolver = _resolver;
+
+            Client = clientBuilder
                 .WithCertificateStoreDetails(config.CertificateStoreDetails)
                 .Build();
         }

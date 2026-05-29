@@ -1,6 +1,7 @@
 # 3.5.0
 
 - feat: Added PAM Support
+- chore(client): Removed Azure support for Germany datacenter - been depreicated by Microsoft.
 
 # 3.4.0
 

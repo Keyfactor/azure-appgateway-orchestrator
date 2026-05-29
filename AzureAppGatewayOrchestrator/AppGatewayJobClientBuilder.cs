@@ -42,7 +42,7 @@ public class AppGatewayJobClientBuilder<TBuilder> where TBuilder : IAzureAppGate
 
     public AppGatewayJobClientBuilder<TBuilder> WithCertificateStoreDetails(CertificateStore details)
     {
-        _logger.LogDebug($"Builder - Setting values from Certificate Store Details: {JsonConvert.SerializeObject(details)}");
+        _logger.LogDebug($"Builder - Configuring client from Certificate Store: ClientMachine={details.ClientMachine}, StorePath={details.StorePath}");
 
         CertificateStoreProperties properties = JsonConvert.DeserializeObject<CertificateStoreProperties>(details.Properties);
 

@@ -110,9 +110,6 @@ public class GatewayClient : IAzureAppGatewayClient
                 case "china":
                     _azureCloudEndpoint = AzureAuthorityHosts.AzureChina;
                     break;
-                case "germany":
-                    _azureCloudEndpoint = AzureAuthorityHosts.AzureGermany;
-                    break;
                 case "government":
                     _azureCloudEndpoint = AzureAuthorityHosts.AzureGovernment;
                     break;

@@ -12,7 +12,7 @@ namespace AzureAppGatewayOrchestrator
 
             if (resolver == null)
             {
-                logger.LogError($"No PAM Resolver was found or configured, using {description} value from PAM.");
+                logger.LogTrace($"No PAM Resolver configured - using {description} value directly from store configuration.");
                 logger.MethodExit();
                 return key;
             }

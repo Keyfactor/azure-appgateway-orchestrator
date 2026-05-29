@@ -54,7 +54,7 @@
               "Name": "AzureCloud",
               "DisplayName": "Azure Global Cloud Authority Host",
               "Type": "MultipleChoice",
-              "DefaultValue": "public,china,germany,government",
+              "DefaultValue": "public,china,government",
               "Description": "Specifies the Azure Cloud instance used by the organization.",
               "Required": false
             },
@@ -118,7 +118,7 @@
               "Name": "AzureCloud",
               "DisplayName": "Azure Global Cloud Authority Host",
               "Type": "MultipleChoice",
-              "DefaultValue": "public,china,germany,government",
+              "DefaultValue": "public,china,government",
               "Description": "Specifies the Azure Cloud instance used by the organization.",
               "Required": false
             },

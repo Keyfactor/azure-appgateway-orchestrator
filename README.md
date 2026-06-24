@@ -38,17 +38,15 @@ The Azure Application Gateway Orchestrator extension remotely manages certificat
 > If the certificate management capabilities of Azure Key Vault are desired over direct management of certificates in Application Gateways, the Azure Key Vault orchestrator can be used in conjunction with this extension for accurate certificate location reporting via the inventory job type. This management strategy requires manual binding of certificates imported to an Application Gateway from AKV and can result in broken state in the Azure Application Gateway in the case that the secret is deleted in AKV.
 
 The Azure Application Gateway Universal Orchestrator extension implements 2 Certificate Store Types. Depending on your use case, you may elect to use one, or both of these Certificate Store Types. Descriptions of each are provided below.
-
 - [Azure Application Gateway Certificate](#AzureAppGw)
-
 - [Azure Application Gateway Certificate Binding](#AppGwBin)
-
 
 ## Compatibility
 
 This integration is compatible with Keyfactor Universal Orchestrator version 10.4 and later.
 
 ## Support
+
 The Azure Application Gateway Universal Orchestrator extension is supported by Keyfactor. If you require support for any issues or have feature request, please open a support ticket by either contacting your Keyfactor representative or via the Keyfactor Support Portal at https://support.keyfactor.com.
 
 > If you want to contribute bug fixes or additional enhancements, use the **[Pull requests](../../pulls)** tab.
@@ -56,7 +54,6 @@ The Azure Application Gateway Universal Orchestrator extension is supported by K
 ## Requirements & Prerequisites
 
 Before installing the Azure Application Gateway Universal Orchestrator extension, we recommend that you install [kfutil](https://github.com/Keyfactor/kfutil). Kfutil is a command-line tool that simplifies the process of creating store types, installing extensions, and instantiating certificate stores in Keyfactor Command.
-
 
 ### Azure Service Principal (Azure Resource Manager Authentication)
 
@@ -137,7 +134,6 @@ authenticate to the Microsoft Graph API.
 You will use `clientcert.[pem|pfx].base64` as the **ClientCertificate** field in
 the [Certificate Store Configuration](#certificate-store-configuration) section.
 
-
 ## Certificate Store Types
 
 To use the Azure Application Gateway Universal Orchestrator extension, you **must** create the Certificate Store Types required for your use-case. This only needs to happen _once_ per Keyfactor Command instance.
@@ -147,7 +143,6 @@ The Azure Application Gateway Universal Orchestrator extension implements 2 Cert
 ### AzureAppGw
 
 <details><summary>Click to expand details</summary>
-
 
 The Azure Application Gateway Certificate store type, `AzureAppGw`, manages `ApplicationGatewaySslCertificate` objects
 owned by Azure Application Gateways. This store type collects inventory and manages all ApplicationGatewaySslCertificate
@@ -201,24 +196,22 @@ have appropriate permissions to read secrets from the AKV that the App Gateway i
 in the AzureApplicationSslCertificate will be accessed exactly as reported by Azure, regardless of whether it exists in
 AKV.
 
-
-
-
 #### Supported Operations
 
-| Operation    | Is Supported                                                                                                           |
-|--------------|------------------------------------------------------------------------------------------------------------------------|
-| Add          | ✅ Checked        |
-| Remove       | ✅ Checked     |
-| Discovery    | ✅ Checked  |
+| Operation    | Is Supported |
+|--------------|--------------|
+| Add          | ✅ Checked |
+| Remove       | ✅ Checked |
+| Discovery    | ✅ Checked |
 | Reenrollment | 🔲 Unchecked |
-| Create       | 🔲 Unchecked     |
+| Create       | 🔲 Unchecked |
 
 #### Store Type Creation
 
 ##### Using kfutil:
 `kfutil` is a custom CLI for the Keyfactor Command API and can be used to create certificate store types.
 For more information on [kfutil](https://github.com/Keyfactor/kfutil) check out the [docs](https://github.com/Keyfactor/kfutil?tab=readme-ov-file#quickstart)
+
    <details><summary>Click to expand AzureAppGw kfutil details</summary>
 
    ##### Using online definition from GitHub:
@@ -237,10 +230,10 @@ For more information on [kfutil](https://github.com/Keyfactor/kfutil) check out 
    ```
    </details>
 
-
 #### Manual Creation
 Below are instructions on how to create the AzureAppGw store type manually in
 the Keyfactor Command Portal
+
    <details><summary>Click to expand manual AzureAppGw details</summary>
 
    Create a store type called `AzureAppGw` with the attributes in the tables below:
@@ -251,11 +244,11 @@ the Keyfactor Command Portal
    | Name | Azure Application Gateway Certificate | Display name for the store type (may be customized) |
    | Short Name | AzureAppGw | Short display name for the store type |
    | Capability | AzureAppGw | Store type name orchestrator will register with. Check the box to allow entry of value |
-   | Supports Add | ✅ Checked | Check the box. Indicates that the Store Type supports Management Add |
-   | Supports Remove | ✅ Checked | Check the box. Indicates that the Store Type supports Management Remove |
-   | Supports Discovery | ✅ Checked | Check the box. Indicates that the Store Type supports Discovery |
-   | Supports Reenrollment | 🔲 Unchecked |  Indicates that the Store Type supports Reenrollment |
-   | Supports Create | 🔲 Unchecked |  Indicates that the Store Type supports store creation |
+   | Supports Add | ✅ Checked | Indicates that the Store Type supports Management Add |
+   | Supports Remove | ✅ Checked | Indicates that the Store Type supports Management Remove |
+   | Supports Discovery | ✅ Checked | Indicates that the Store Type supports Discovery |
+   | Supports Reenrollment | 🔲 Unchecked | Indicates that the Store Type supports Reenrollment |
+   | Supports Create | 🔲 Unchecked | Indicates that the Store Type supports store creation |
    | Needs Server | ✅ Checked | Determines if a target server name is required when creating store |
    | Blueprint Allowed | 🔲 Unchecked | Determines if store type may be included in an Orchestrator blueprint |
    | Uses PowerShell | 🔲 Unchecked | Determines if underlying implementation is PowerShell |
@@ -264,18 +257,18 @@ the Keyfactor Command Portal
 
    The Basic tab should look like this:
 
-   ![AzureAppGw Basic Tab](docsource/images/AzureAppGw-basic-store-type-dialog.png)
+   ![AzureAppGw Basic Tab](docsource/images/AzureAppGw-basic-store-type-dialog.svg)
 
    ##### Advanced Tab
    | Attribute | Value | Description |
    | --------- | ----- | ----- |
    | Supports Custom Alias | Required | Determines if an individual entry within a store can have a custom Alias. |
-   | Private Key Handling | Required | This determines if Keyfactor can send the private key associated with a certificate to the store. Required because IIS certificates without private keys would be invalid. |
+   | Private Key Handling | Required | This determines if Keyfactor can send the private key associated with a certificate to the store. |
    | PFX Password Style | Default | 'Default' - PFX password is randomly generated, 'Custom' - PFX password may be specified when the enrollment job is created (Requires the Allow Custom Password application setting to be enabled.) |
 
    The Advanced tab should look like this:
 
-   ![AzureAppGw Advanced Tab](docsource/images/AzureAppGw-advanced-store-type-dialog.png)
+   ![AzureAppGw Advanced Tab](docsource/images/AzureAppGw-advanced-store-type-dialog.svg)
 
    > For Keyfactor **Command versions 24.4 and later**, a Certificate Format dropdown is available with PFX and PEM options. Ensure that **PFX** is selected, as this determines the format of new and renewed certificates sent to the Orchestrator during a Management job. Currently, all Keyfactor-supported Orchestrator extensions support only PFX.
 
@@ -287,13 +280,12 @@ the Keyfactor Command Portal
    | ServerUsername | Server Username | Application ID of the service principal, representing the identity used for managing the Application Gateway. | Secret |  | 🔲 Unchecked |
    | ServerPassword | Server Password | A Client Secret that the extension will use to authenticate with the Azure Resource Management API for managing Application Gateway certificates, OR the password that encrypts the private key in ClientCertificate | Secret |  | 🔲 Unchecked |
    | ClientCertificate | Client Certificate | The client certificate used to authenticate with Azure Resource Management API for managing Application Gateway certificates. See the [requirements](#client-certificate-or-client-secret) for more information. | Secret |  | 🔲 Unchecked |
-   | AzureCloud | Azure Global Cloud Authority Host | Specifies the Azure Cloud instance used by the organization. | MultipleChoice | public,china,germany,government | 🔲 Unchecked |
+   | AzureCloud | Azure Global Cloud Authority Host | Specifies the Azure Cloud instance used by the organization. | MultipleChoice | public,china,government | 🔲 Unchecked |
    | ServerUseSsl | Use SSL | Specifies whether SSL should be used for communication with the server. Set to 'true' to enable SSL, and 'false' to disable it. | Bool | true | ✅ Checked |
 
    The Custom Fields tab should look like this:
 
-   ![AzureAppGw Custom Fields Tab](docsource/images/AzureAppGw-custom-fields-store-type-dialog.png)
-
+   ![AzureAppGw Custom Fields Tab](docsource/images/AzureAppGw-custom-fields-store-type-dialog.svg)
 
    ###### Server Username
    Application ID of the service principal, representing the identity used for managing the Application Gateway.
@@ -301,8 +293,6 @@ the Keyfactor Command Portal
 
    > [!IMPORTANT]
    > This field is created by the `Needs Server` on the Basic tab, do not create this field manually.
-
-
 
 
    ###### Server Password
@@ -313,32 +303,22 @@ the Keyfactor Command Portal
    > This field is created by the `Needs Server` on the Basic tab, do not create this field manually.
 
 
-
-
    ###### Client Certificate
    The client certificate used to authenticate with Azure Resource Management API for managing Application Gateway certificates. See the [requirements](#client-certificate-or-client-secret) for more information.
 
-   ![AzureAppGw Custom Field - ClientCertificate](docsource/images/AzureAppGw-custom-field-ClientCertificate-dialog.png)
-   ![AzureAppGw Custom Field - ClientCertificate](docsource/images/AzureAppGw-custom-field-ClientCertificate-validation-options-dialog.png)
-
+   ![AzureAppGw Custom Field - ClientCertificate](docsource/images/AzureAppGw-custom-field-ClientCertificate-dialog.svg)
 
 
    ###### Azure Global Cloud Authority Host
    Specifies the Azure Cloud instance used by the organization.
 
-   ![AzureAppGw Custom Field - AzureCloud](docsource/images/AzureAppGw-custom-field-AzureCloud-dialog.png)
-   ![AzureAppGw Custom Field - AzureCloud](docsource/images/AzureAppGw-custom-field-AzureCloud-validation-options-dialog.png)
-
+   ![AzureAppGw Custom Field - AzureCloud](docsource/images/AzureAppGw-custom-field-AzureCloud-dialog.svg)
 
 
    ###### Use SSL
    Specifies whether SSL should be used for communication with the server. Set to 'true' to enable SSL, and 'false' to disable it.
 
-   ![AzureAppGw Custom Field - ServerUseSsl](docsource/images/AzureAppGw-custom-field-ServerUseSsl-dialog.png)
-   ![AzureAppGw Custom Field - ServerUseSsl](docsource/images/AzureAppGw-custom-field-ServerUseSsl-validation-options-dialog.png)
-
-
-
+   ![AzureAppGw Custom Field - ServerUseSsl](docsource/images/AzureAppGw-custom-field-ServerUseSsl-dialog.svg)
 
 
    </details>
@@ -347,7 +327,6 @@ the Keyfactor Command Portal
 ### AppGwBin
 
 <details><summary>Click to expand details</summary>
-
 
 The Azure Application Gateway Certificate Binding store type, `AzureAppGwBin`, represents certificates bound to TLS
 Listeners on Azure App Gateways. The only supported operations on this store type are Management Add and Inventory. The
@@ -411,24 +390,22 @@ have appropriate permissions to read secrets from the AKV that the App Gateway i
 in the AzureApplicationSslCertificate will be accessed exactly as reported by Azure, regardless of whether it exists in
 AKV.
 
-
-
-
 #### Supported Operations
 
-| Operation    | Is Supported                                                                                                           |
-|--------------|------------------------------------------------------------------------------------------------------------------------|
-| Add          | ✅ Checked        |
-| Remove       | 🔲 Unchecked     |
-| Discovery    | ✅ Checked  |
+| Operation    | Is Supported |
+|--------------|--------------|
+| Add          | ✅ Checked |
+| Remove       | 🔲 Unchecked |
+| Discovery    | ✅ Checked |
 | Reenrollment | 🔲 Unchecked |
-| Create       | 🔲 Unchecked     |
+| Create       | 🔲 Unchecked |
 
 #### Store Type Creation
 
 ##### Using kfutil:
 `kfutil` is a custom CLI for the Keyfactor Command API and can be used to create certificate store types.
 For more information on [kfutil](https://github.com/Keyfactor/kfutil) check out the [docs](https://github.com/Keyfactor/kfutil?tab=readme-ov-file#quickstart)
+
    <details><summary>Click to expand AppGwBin kfutil details</summary>
 
    ##### Using online definition from GitHub:
@@ -447,10 +424,10 @@ For more information on [kfutil](https://github.com/Keyfactor/kfutil) check out 
    ```
    </details>
 
-
 #### Manual Creation
 Below are instructions on how to create the AppGwBin store type manually in
 the Keyfactor Command Portal
+
    <details><summary>Click to expand manual AppGwBin details</summary>
 
    Create a store type called `AppGwBin` with the attributes in the tables below:
@@ -461,11 +438,11 @@ the Keyfactor Command Portal
    | Name | Azure Application Gateway Certificate Binding | Display name for the store type (may be customized) |
    | Short Name | AppGwBin | Short display name for the store type |
    | Capability | AzureAppGwBin | Store type name orchestrator will register with. Check the box to allow entry of value |
-   | Supports Add | ✅ Checked | Check the box. Indicates that the Store Type supports Management Add |
-   | Supports Remove | 🔲 Unchecked |  Indicates that the Store Type supports Management Remove |
-   | Supports Discovery | ✅ Checked | Check the box. Indicates that the Store Type supports Discovery |
-   | Supports Reenrollment | 🔲 Unchecked |  Indicates that the Store Type supports Reenrollment |
-   | Supports Create | 🔲 Unchecked |  Indicates that the Store Type supports store creation |
+   | Supports Add | ✅ Checked | Indicates that the Store Type supports Management Add |
+   | Supports Remove | 🔲 Unchecked | Indicates that the Store Type supports Management Remove |
+   | Supports Discovery | ✅ Checked | Indicates that the Store Type supports Discovery |
+   | Supports Reenrollment | 🔲 Unchecked | Indicates that the Store Type supports Reenrollment |
+   | Supports Create | 🔲 Unchecked | Indicates that the Store Type supports store creation |
    | Needs Server | ✅ Checked | Determines if a target server name is required when creating store |
    | Blueprint Allowed | 🔲 Unchecked | Determines if store type may be included in an Orchestrator blueprint |
    | Uses PowerShell | 🔲 Unchecked | Determines if underlying implementation is PowerShell |
@@ -474,18 +451,18 @@ the Keyfactor Command Portal
 
    The Basic tab should look like this:
 
-   ![AppGwBin Basic Tab](docsource/images/AppGwBin-basic-store-type-dialog.png)
+   ![AppGwBin Basic Tab](docsource/images/AppGwBin-basic-store-type-dialog.svg)
 
    ##### Advanced Tab
    | Attribute | Value | Description |
    | --------- | ----- | ----- |
    | Supports Custom Alias | Required | Determines if an individual entry within a store can have a custom Alias. |
-   | Private Key Handling | Required | This determines if Keyfactor can send the private key associated with a certificate to the store. Required because IIS certificates without private keys would be invalid. |
+   | Private Key Handling | Required | This determines if Keyfactor can send the private key associated with a certificate to the store. |
    | PFX Password Style | Default | 'Default' - PFX password is randomly generated, 'Custom' - PFX password may be specified when the enrollment job is created (Requires the Allow Custom Password application setting to be enabled.) |
 
    The Advanced tab should look like this:
 
-   ![AppGwBin Advanced Tab](docsource/images/AppGwBin-advanced-store-type-dialog.png)
+   ![AppGwBin Advanced Tab](docsource/images/AppGwBin-advanced-store-type-dialog.svg)
 
    > For Keyfactor **Command versions 24.4 and later**, a Certificate Format dropdown is available with PFX and PEM options. Ensure that **PFX** is selected, as this determines the format of new and renewed certificates sent to the Orchestrator during a Management job. Currently, all Keyfactor-supported Orchestrator extensions support only PFX.
 
@@ -497,13 +474,12 @@ the Keyfactor Command Portal
    | ServerUsername | Server Username | Application ID of the service principal, representing the identity used for managing the Application Gateway. | Secret |  | 🔲 Unchecked |
    | ServerPassword | Server Password | A Client Secret that the extension will use to authenticate with the Azure Resource Management API for managing Application Gateway certificates, OR the password that encrypts the private key in ClientCertificate | Secret |  | 🔲 Unchecked |
    | ClientCertificate | Client Certificate | The client certificate used to authenticate with Azure Resource Management API for managing Application Gateway certificates. See the [requirements](#client-certificate-or-client-secret) for more information. | Secret |  | 🔲 Unchecked |
-   | AzureCloud | Azure Global Cloud Authority Host | Specifies the Azure Cloud instance used by the organization. | MultipleChoice | public,china,germany,government | 🔲 Unchecked |
+   | AzureCloud | Azure Global Cloud Authority Host | Specifies the Azure Cloud instance used by the organization. | MultipleChoice | public,china,government | 🔲 Unchecked |
    | ServerUseSsl | Use SSL | Specifies whether SSL should be used for communication with the server. Set to 'true' to enable SSL, and 'false' to disable it. | Bool | true | ✅ Checked |
 
    The Custom Fields tab should look like this:
 
-   ![AppGwBin Custom Fields Tab](docsource/images/AppGwBin-custom-fields-store-type-dialog.png)
-
+   ![AppGwBin Custom Fields Tab](docsource/images/AppGwBin-custom-fields-store-type-dialog.svg)
 
    ###### Server Username
    Application ID of the service principal, representing the identity used for managing the Application Gateway.
@@ -511,8 +487,6 @@ the Keyfactor Command Portal
 
    > [!IMPORTANT]
    > This field is created by the `Needs Server` on the Basic tab, do not create this field manually.
-
-
 
 
    ###### Server Password
@@ -523,32 +497,22 @@ the Keyfactor Command Portal
    > This field is created by the `Needs Server` on the Basic tab, do not create this field manually.
 
 
-
-
    ###### Client Certificate
    The client certificate used to authenticate with Azure Resource Management API for managing Application Gateway certificates. See the [requirements](#client-certificate-or-client-secret) for more information.
 
-   ![AppGwBin Custom Field - ClientCertificate](docsource/images/AppGwBin-custom-field-ClientCertificate-dialog.png)
-   ![AppGwBin Custom Field - ClientCertificate](docsource/images/AppGwBin-custom-field-ClientCertificate-validation-options-dialog.png)
-
+   ![AppGwBin Custom Field - ClientCertificate](docsource/images/AppGwBin-custom-field-ClientCertificate-dialog.svg)
 
 
    ###### Azure Global Cloud Authority Host
    Specifies the Azure Cloud instance used by the organization.
 
-   ![AppGwBin Custom Field - AzureCloud](docsource/images/AppGwBin-custom-field-AzureCloud-dialog.png)
-   ![AppGwBin Custom Field - AzureCloud](docsource/images/AppGwBin-custom-field-AzureCloud-validation-options-dialog.png)
-
+   ![AppGwBin Custom Field - AzureCloud](docsource/images/AppGwBin-custom-field-AzureCloud-dialog.svg)
 
 
    ###### Use SSL
    Specifies whether SSL should be used for communication with the server. Set to 'true' to enable SSL, and 'false' to disable it.
 
-   ![AppGwBin Custom Field - ServerUseSsl](docsource/images/AppGwBin-custom-field-ServerUseSsl-dialog.png)
-   ![AppGwBin Custom Field - ServerUseSsl](docsource/images/AppGwBin-custom-field-ServerUseSsl-validation-options-dialog.png)
-
-
-
+   ![AppGwBin Custom Field - ServerUseSsl](docsource/images/AppGwBin-custom-field-ServerUseSsl-dialog.svg)
 
 
    </details>
@@ -559,14 +523,15 @@ the Keyfactor Command Portal
 
 1. **Download the latest Azure Application Gateway Universal Orchestrator extension from GitHub.**
 
-    Navigate to the [Azure Application Gateway Universal Orchestrator extension GitHub version page](https://github.com/Keyfactor/azure-appgateway-orchestrator/releases/latest). Refer to the compatibility matrix below to determine the asset should be downloaded. Then, click the corresponding asset to download the zip archive.
+    Navigate to the [Azure Application Gateway Universal Orchestrator extension GitHub version page](https://github.com/Keyfactor/azure-appgateway-orchestrator/releases/latest). Refer to the compatibility matrix below to determine which asset should be downloaded. Then, click the corresponding asset to download the zip archive.
 
    | Universal Orchestrator Version | Latest .NET version installed on the Universal Orchestrator server | `rollForward` condition in `Orchestrator.runtimeconfig.json` | `azure-appgateway-orchestrator` .NET version to download |
    | --------- | ----------- | ----------- | ----------- |
    | Older than `11.0.0` | | | `net6.0` |
    | Between `11.0.0` and `11.5.1` (inclusive) | `net6.0` | | `net6.0` |
-   | Between `11.0.0` and `11.5.1` (inclusive) | `net8.0` | `Disable` | `net6.0` || Between `11.0.0` and `11.5.1` (inclusive) | `net8.0` | `LatestMajor` | `net8.0` |
-   | `11.6` _and_ newer | `net8.0` | | `net8.0` | 
+   | Between `11.0.0` and `11.5.1` (inclusive) | `net8.0` | `Disable` | `net6.0` |
+   | Between `11.0.0` and `11.5.1` (inclusive) | `net8.0` | `LatestMajor` | `net8.0` |
+   | `11.6` _and_ newer | `net8.0` | | `net8.0` |
 
     Unzip the archive containing extension assemblies to a known location.
 
@@ -588,24 +553,19 @@ the Keyfactor Command Portal
 
     Refer to [Starting/Restarting the Universal Orchestrator service](https://software.keyfactor.com/Core-OnPrem/Current/Content/InstallingAgents/NetCoreOrchestrator/StarttheService.htm).
 
-
 6. **(optional) PAM Integration**
 
     The Azure Application Gateway Universal Orchestrator extension is compatible with all supported Keyfactor PAM extensions to resolve PAM-eligible secrets. PAM extensions running on Universal Orchestrators enable secure retrieval of secrets from a connected PAM provider.
 
     To configure a PAM provider, [reference the Keyfactor Integration Catalog](https://keyfactor.github.io/integrations-catalog/content/pam) to select an extension and follow the associated instructions to install it on the Universal Orchestrator (remote).
 
-
 > The above installation steps can be supplemented by the [official Command documentation](https://software.keyfactor.com/Core-OnPrem/Current/Content/InstallingAgents/NetCoreOrchestrator/CustomExtensions.htm?Highlight=extensions).
-
-
 
 ## Defining Certificate Stores
 
 The Azure Application Gateway Universal Orchestrator extension implements 2 Certificate Store Types, each of which implements different functionality. Refer to the individual instructions below for each Certificate Store Type that you deemed necessary for your use case from the installation section.
 
 <details><summary>Azure Application Gateway Certificate (AzureAppGw)</summary>
-
 
 ### Store Creation
 
@@ -621,8 +581,8 @@ The Azure Application Gateway Universal Orchestrator extension implements 2 Cert
 
     Click the Add button to add a new Certificate Store. Use the table below to populate the **Attributes** in the **Add** form.
 
-   | Attribute | Description                                             |
-   | --------- |---------------------------------------------------------|
+   | Attribute | Description |
+   | --------- | ----------- |
    | Category | Select "Azure Application Gateway Certificate" or the customized certificate store name from the previous step. |
    | Container | Optional container to associate certificate store with. |
    | Client Machine | The Azure Tenant (directory) ID that owns the Service Principal. |
@@ -635,8 +595,6 @@ The Azure Application Gateway Universal Orchestrator extension implements 2 Cert
    | ServerUseSsl | Specifies whether SSL should be used for communication with the server. Set to 'true' to enable SSL, and 'false' to disable it. |
 
 </details>
-
-
 
 #### Using kfutil CLI
 
@@ -672,7 +630,6 @@ The Azure Application Gateway Universal Orchestrator extension implements 2 Cert
 
 </details>
 
-
 #### PAM Provider Eligible Fields
 <details><summary>Attributes eligible for retrieval by a PAM Provider on the Universal Orchestrator</summary>
 
@@ -689,14 +646,11 @@ Please refer to the **Universal Orchestrator (remote)** usage section ([PAM prov
 
 </details>
 
-
 > The content in this section can be supplemented by the [official Command documentation](https://software.keyfactor.com/Core-OnPrem/Current/Content/ReferenceGuide/Certificate%20Stores.htm?Highlight=certificate%20store).
-
 
 </details>
 
 <details><summary>Azure Application Gateway Certificate Binding (AppGwBin)</summary>
-
 
 ### Store Creation
 
@@ -712,8 +666,8 @@ Please refer to the **Universal Orchestrator (remote)** usage section ([PAM prov
 
     Click the Add button to add a new Certificate Store. Use the table below to populate the **Attributes** in the **Add** form.
 
-   | Attribute | Description                                             |
-   | --------- |---------------------------------------------------------|
+   | Attribute | Description |
+   | --------- | ----------- |
    | Category | Select "Azure Application Gateway Certificate Binding" or the customized certificate store name from the previous step. |
    | Container | Optional container to associate certificate store with. |
    | Client Machine | The Azure Tenant (directory) ID that owns the Service Principal. |
@@ -726,8 +680,6 @@ Please refer to the **Universal Orchestrator (remote)** usage section ([PAM prov
    | ServerUseSsl | Specifies whether SSL should be used for communication with the server. Set to 'true' to enable SSL, and 'false' to disable it. |
 
 </details>
-
-
 
 #### Using kfutil CLI
 
@@ -763,7 +715,6 @@ Please refer to the **Universal Orchestrator (remote)** usage section ([PAM prov
 
 </details>
 
-
 #### PAM Provider Eligible Fields
 <details><summary>Attributes eligible for retrieval by a PAM Provider on the Universal Orchestrator</summary>
 
@@ -780,12 +731,9 @@ Please refer to the **Universal Orchestrator (remote)** usage section ([PAM prov
 
 </details>
 
-
 > The content in this section can be supplemented by the [official Command documentation](https://software.keyfactor.com/Core-OnPrem/Current/Content/ReferenceGuide/Certificate%20Stores.htm?Highlight=certificate%20store).
 
-
 </details>
-
 
 
 ## Discovery Job
@@ -797,7 +745,6 @@ The Discovery operation uses the "Directories to search" field, and accepts inpu
 - `<tenant-id>,<tenant-id>,...` - If a comma-separated list of tenant IDs is used, the extension will search for Application Gateways in every resource group and tenant specified in the list. The tenant IDs should be the GUIDs associated with each tenant, and it's the user's responsibility to ensure that the service principal has access to the specified tenants.
 
 > The Discovery Job only supports Client Secret authentication.
-
 
 ## License
 

@@ -307,18 +307,21 @@ the Keyfactor Command Portal
    The client certificate used to authenticate with Azure Resource Management API for managing Application Gateway certificates. See the [requirements](#client-certificate-or-client-secret) for more information.
 
    ![AzureAppGw Custom Field - ClientCertificate](docsource/images/AzureAppGw-custom-field-ClientCertificate-dialog.svg)
+   ![AzureAppGw Custom Field - ClientCertificate](docsource/images/AzureAppGw-custom-field-ClientCertificate-validation-options-dialog.svg)
 
 
    ###### Azure Global Cloud Authority Host
    Specifies the Azure Cloud instance used by the organization.
 
    ![AzureAppGw Custom Field - AzureCloud](docsource/images/AzureAppGw-custom-field-AzureCloud-dialog.svg)
+   ![AzureAppGw Custom Field - AzureCloud](docsource/images/AzureAppGw-custom-field-AzureCloud-validation-options-dialog.svg)
 
 
    ###### Use SSL
    Specifies whether SSL should be used for communication with the server. Set to 'true' to enable SSL, and 'false' to disable it.
 
    ![AzureAppGw Custom Field - ServerUseSsl](docsource/images/AzureAppGw-custom-field-ServerUseSsl-dialog.svg)
+   ![AzureAppGw Custom Field - ServerUseSsl](docsource/images/AzureAppGw-custom-field-ServerUseSsl-validation-options-dialog.svg)
 
 
    </details>
@@ -501,18 +504,21 @@ the Keyfactor Command Portal
    The client certificate used to authenticate with Azure Resource Management API for managing Application Gateway certificates. See the [requirements](#client-certificate-or-client-secret) for more information.
 
    ![AppGwBin Custom Field - ClientCertificate](docsource/images/AppGwBin-custom-field-ClientCertificate-dialog.svg)
+   ![AppGwBin Custom Field - ClientCertificate](docsource/images/AppGwBin-custom-field-ClientCertificate-validation-options-dialog.svg)
 
 
    ###### Azure Global Cloud Authority Host
    Specifies the Azure Cloud instance used by the organization.
 
    ![AppGwBin Custom Field - AzureCloud](docsource/images/AppGwBin-custom-field-AzureCloud-dialog.svg)
+   ![AppGwBin Custom Field - AzureCloud](docsource/images/AppGwBin-custom-field-AzureCloud-validation-options-dialog.svg)
 
 
    ###### Use SSL
    Specifies whether SSL should be used for communication with the server. Set to 'true' to enable SSL, and 'false' to disable it.
 
    ![AppGwBin Custom Field - ServerUseSsl](docsource/images/AppGwBin-custom-field-ServerUseSsl-dialog.svg)
+   ![AppGwBin Custom Field - ServerUseSsl](docsource/images/AppGwBin-custom-field-ServerUseSsl-validation-options-dialog.svg)
 
 
    </details>

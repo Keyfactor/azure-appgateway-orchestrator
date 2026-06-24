@@ -287,7 +287,7 @@ the Keyfactor Command Portal
    | ServerUsername | Server Username | Application ID of the service principal, representing the identity used for managing the Application Gateway. | Secret |  | 🔲 Unchecked |
    | ServerPassword | Server Password | A Client Secret that the extension will use to authenticate with the Azure Resource Management API for managing Application Gateway certificates, OR the password that encrypts the private key in ClientCertificate | Secret |  | 🔲 Unchecked |
    | ClientCertificate | Client Certificate | The client certificate used to authenticate with Azure Resource Management API for managing Application Gateway certificates. See the [requirements](#client-certificate-or-client-secret) for more information. | Secret |  | 🔲 Unchecked |
-   | AzureCloud | Azure Global Cloud Authority Host | Specifies the Azure Cloud instance used by the organization. | MultipleChoice | public,china,germany,government | 🔲 Unchecked |
+   | AzureCloud | Azure Global Cloud Authority Host | Specifies the Azure Cloud instance used by the organization. | MultipleChoice | public,china,government | 🔲 Unchecked |
    | ServerUseSsl | Use SSL | Specifies whether SSL should be used for communication with the server. Set to 'true' to enable SSL, and 'false' to disable it. | Bool | true | ✅ Checked |
 
    The Custom Fields tab should look like this:
@@ -497,7 +497,7 @@ the Keyfactor Command Portal
    | ServerUsername | Server Username | Application ID of the service principal, representing the identity used for managing the Application Gateway. | Secret |  | 🔲 Unchecked |
    | ServerPassword | Server Password | A Client Secret that the extension will use to authenticate with the Azure Resource Management API for managing Application Gateway certificates, OR the password that encrypts the private key in ClientCertificate | Secret |  | 🔲 Unchecked |
    | ClientCertificate | Client Certificate | The client certificate used to authenticate with Azure Resource Management API for managing Application Gateway certificates. See the [requirements](#client-certificate-or-client-secret) for more information. | Secret |  | 🔲 Unchecked |
-   | AzureCloud | Azure Global Cloud Authority Host | Specifies the Azure Cloud instance used by the organization. | MultipleChoice | public,china,germany,government | 🔲 Unchecked |
+   | AzureCloud | Azure Global Cloud Authority Host | Specifies the Azure Cloud instance used by the organization. | MultipleChoice | public,china,government | 🔲 Unchecked |
    | ServerUseSsl | Use SSL | Specifies whether SSL should be used for communication with the server. Set to 'true' to enable SSL, and 'false' to disable it. | Bool | true | ✅ Checked |
 
    The Custom Fields tab should look like this:

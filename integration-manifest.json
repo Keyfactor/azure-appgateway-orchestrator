@@ -13,7 +13,7 @@
     "orchestrator": {
       "UOFramework": "10.4",
       "pam_support": true,
-      "keyfactor_platform_versioin":  "9.10",
+      "keyfactor_platform_version":  "9.10",
       "store_types": [
         {
           "Name": "Azure Application Gateway Certificate",

@@ -1,3 +1,8 @@
+# 3.5.0
+
+- feat: Added PAM Support
+- chore(client): Removed Azure support for Germany data center - been depreciated by Microsoft.
+
 # 3.4.0
 
 - Renamed the extension's dll in the manifest.json so the UO would recognize and register the extension.
@@ -9,7 +14,7 @@
 
 # 3.2.0
 
-- chore(docs): Upgrade GitHub Actions to use Bootstrap Workflow v3 to support Doctool
+- chore(docs): Upgrade GitHub Actions to use Bootstrap Workflow v3 to support Doc tool
 
 # 3.1.0
 

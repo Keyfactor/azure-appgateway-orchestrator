@@ -1,16 +1,10 @@
-// Copyright 2024 Keyfactor
-// 
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-// 
-//     http://www.apache.org/licenses/LICENSE-2.0
-// 
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
+
+//  Copyright 2026 Keyfactor
+//  Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with the License.
+//  You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0
+//  Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an "AS IS" BASIS,
+//  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions
+//  and limitations under the License.
 
 using System.Security.Cryptography;
 using System.Security.Cryptography.X509Certificates;
@@ -20,7 +14,9 @@ using AzureApplicationGatewayOrchestratorExtension;
 using AzureApplicationGatewayOrchestratorExtension.Client;
 using Keyfactor.Logging;
 using Keyfactor.Orchestrators.Extensions;
+using Keyfactor.Orchestrators.Extensions.Interfaces;
 using Microsoft.Extensions.Logging;
+using Moq;
 using NLog.Extensions.Logging;
 
 public class JobClientBuilder
@@ -142,6 +138,70 @@ public class JobClientBuilder
         _logger.LogInformation("AppGatewayJobClientBuilder_ValidCertificateStoreConfigClientCertificate_BuildValidClient - Success");
     }
     
+    [Fact]
+    public void AppGatewayJobClientBuilder_WithPAMResolver_CertificateStoreDetails_ResolvesCredentials()
+    {
+        // Arrange
+        var mockResolver = new Mock<IPAMSecretResolver>();
+        mockResolver.Setup(r => r.Resolve("pam-key-for-username")).Returns("resolved-azure-application-id");
+        mockResolver.Setup(r => r.Resolve("pam-key-for-password")).Returns("resolved-azure-client-secret");
+
+        AppGatewayJobClientBuilder<FakeClient.FakeBuilder> jobClientBuilderWithFakeBuilder = new();
+        jobClientBuilderWithFakeBuilder.resolver = mockResolver.Object;
+
+        CertificateStore fakeCertificateStoreDetails = new()
+        {
+            ClientMachine = "fake-tenant-id",
+            StorePath = "fake-azure-resource-id",
+            Properties = "{\"ServerUsername\":\"pam-key-for-username\",\"ServerPassword\":\"pam-key-for-password\",\"AzureCloud\":\"fake-azure-cloud\"}"
+        };
+
+        // Act
+        jobClientBuilderWithFakeBuilder
+            .WithCertificateStoreDetails(fakeCertificateStoreDetails)
+            .Build();
+
+        // Assert
+        Assert.Equal("resolved-azure-application-id", jobClientBuilderWithFakeBuilder._builder._applicationId);
+        Assert.Equal("resolved-azure-client-secret", jobClientBuilderWithFakeBuilder._builder._clientSecret);
+        mockResolver.Verify(r => r.Resolve("pam-key-for-username"), Times.Once);
+        mockResolver.Verify(r => r.Resolve("pam-key-for-password"), Times.Once);
+
+        _logger.LogInformation("AppGatewayJobClientBuilder_WithPAMResolver_CertificateStoreDetails_ResolvesCredentials - Success");
+    }
+
+    [Fact]
+    public void AppGatewayJobClientBuilder_WithPAMResolver_DiscoveryJobConfiguration_ResolvesCredentials()
+    {
+        // Arrange
+        var mockResolver = new Mock<IPAMSecretResolver>();
+        mockResolver.Setup(r => r.Resolve("pam-key-for-username")).Returns("resolved-azure-application-id");
+        mockResolver.Setup(r => r.Resolve("pam-key-for-password")).Returns("resolved-azure-client-secret");
+
+        AppGatewayJobClientBuilder<FakeClient.FakeBuilder> jobClientBuilderWithFakeBuilder = new();
+        jobClientBuilderWithFakeBuilder.resolver = mockResolver.Object;
+
+        DiscoveryJobConfiguration config = new()
+        {
+            ClientMachine = "fake-tenant-id",
+            ServerUsername = "pam-key-for-username",
+            ServerPassword = "pam-key-for-password"
+        };
+
+        // Act
+        jobClientBuilderWithFakeBuilder
+            .WithDiscoveryJobConfiguration(config, "fake-tenant-id")
+            .Build();
+
+        // Assert
+        Assert.Equal("resolved-azure-application-id", jobClientBuilderWithFakeBuilder._builder._applicationId);
+        Assert.Equal("resolved-azure-client-secret", jobClientBuilderWithFakeBuilder._builder._clientSecret);
+        mockResolver.Verify(r => r.Resolve("pam-key-for-username"), Times.Once);
+        mockResolver.Verify(r => r.Resolve("pam-key-for-password"), Times.Once);
+
+        _logger.LogInformation("AppGatewayJobClientBuilder_WithPAMResolver_DiscoveryJobConfiguration_ResolvesCredentials - Success");
+    }
+
     static void ConfigureLogging()
     {
         var config = new NLog.Config.LoggingConfiguration();

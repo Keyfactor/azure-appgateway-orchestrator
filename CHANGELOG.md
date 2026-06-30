@@ -1,7 +1,7 @@
 # 3.5.0
 
 - feat: Added PAM Support
-- chore(client): Removed Azure support for Germany datacenter - been depreicated by Microsoft.
+- chore(client): Removed Azure support for Germany data center - been depreciated by Microsoft.
 
 # 3.4.0
 
@@ -14,7 +14,7 @@
 
 # 3.2.0
 
-- chore(docs): Upgrade GitHub Actions to use Bootstrap Workflow v3 to support Doctool
+- chore(docs): Upgrade GitHub Actions to use Bootstrap Workflow v3 to support Doc tool
 
 # 3.1.0
 
